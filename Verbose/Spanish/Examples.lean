@@ -9,7 +9,7 @@ Demostración:
   Probemos que ∀ ε > 0, ∃ N, ∀ n ≥ N, |f (u n) - f x₀| ≤ ε
   Sea ε > 0
   Por hf aplicado a ε usando que ε > 0 tenemos δ tal que
-    (δ_pos : δ > 0) con (Hf : ∀ x, |x - x₀| ≤ δ ⇒ |f x - f x₀| ≤ ε)
+    (δ_pos : δ > 0) yy (Hf : ∀ x, |x - x₀| ≤ δ ⇒ |f x - f x₀| ≤ ε)
   Por hu aplicado a δ usando que δ > 0 tenemos N tal que Hu : ∀ n ≥ N, |u n - x₀| ≤ δ
   Probemos que N basta : ∀ n ≥ N, |f (u n) - f x₀| ≤ ε
   Sea n ≥ N
@@ -25,16 +25,16 @@ Ejercicio "Toda función continua implica continuidad de sucesiones"
 Demostración:
   Probemos que ∀ ε > 0, ∃ N, ∀ n ≥ N, |f (u n) - f x₀| ≤ ε
   Sea ε > 0
-  Como f es continua en x₀ con ε > 0 se tiene δ tal que
-    δ > 0 con ∀ x, |x - x₀| ≤ δ ⇒ |f x - f x₀| ≤ ε
-  Como u converge a x₀ con δ > 0 se tiene N tal que ∀ n ≥ N, |u n - x₀| ≤ δ
+  Como f es continua en x₀ yy ε > 0 se tiene δ tal que
+    δ > 0 yy ∀ x, |x - x₀| ≤ δ ⇒ |f x - f x₀| ≤ ε
+  Como u converge a x₀ yy δ > 0 se tiene N tal que ∀ n ≥ N, |u n - x₀| ≤ δ
   Probemos que N basta : ∀ n ≥ N, |f (u n) - f x₀| ≤ ε
   Sea n ≥ N
   Como ∀ x, |x - x₀| ≤ δ → |f x - f x₀| ≤ ε basta probar que |u n - x₀| ≤ δ
-  Como ∀ n ≥ N, |u n - x₀| ≤ δ con n ≥ N concluimos que |u n - x₀| ≤ δ
+  Como ∀ n ≥ N, |u n - x₀| ≤ δ yy n ≥ N concluimos que |u n - x₀| ≤ δ
   /- -- Forward reasoning variation
-  Como ∀ n ≥ N, |u n - x₀| ≤ δ con n ≥ N tenemos that |u n - x₀| ≤ δ
-  Como ∀ x, |x - x₀| ≤ δ → |f x - f x₀| ≤ ε con |u n - x₀| ≤ δ concluimos que |f (u n) - f x₀| ≤ ε -/
+  Como ∀ n ≥ N, |u n - x₀| ≤ δ yy n ≥ N tenemos that |u n - x₀| ≤ δ
+  Como ∀ x, |x - x₀| ≤ δ → |f x - f x₀| ≤ ε yy |u n - x₀| ≤ δ concluimos que |f (u n) - f x₀| ≤ ε -/
 QED
 
 Ejemplo "Toda sucesión constante es convergente."
@@ -86,7 +86,7 @@ Demostración:
   Calc
   |(u + v) n - (l + l')| = |(u n - l) + (v n - l')| por cálculo
                      _ ≤ |u n - l| + |v n - l'|     por abs_add_le
-                     _ ≤  ε/2 + ε/2                 por fact₁ con fact₂
+                     _ ≤  ε/2 + ε/2                 por fact₁ yy fact₂
                      _ =  ε                         por cálculo
 QED
 
@@ -99,12 +99,12 @@ Ejemplo "Teorema del sandwhich"
 Demostración:
   Probemos que ∀ ε > 0, ∃ N, ∀ n ≥ N, |v n - l| ≤ ε
   Sea ε > 0
-  Como u converge a l con ε > 0 se tiene N tal que ∀ n ≥ N, |u n - l| ≤ ε
-  Como w converge a l con ε > 0 se tiene N' tal que ∀ n ≥ N', |w n - l| ≤ ε
+  Como u converge a l yy ε > 0 se tiene N tal que ∀ n ≥ N, |u n - l| ≤ ε
+  Como w converge a l yy ε > 0 se tiene N' tal que ∀ n ≥ N', |w n - l| ≤ ε
   Probemos que max N N' basta : ∀ n ≥ max N N', |v n - l| ≤ ε
   Sea n ≥ max N N'
-  Como ∀ n ≥ N,  |u n - l| ≤ ε con n ≥ N  tenemos que |u n - l| ≤ ε
-  Como ∀ n ≥ N', |w n - l| ≤ ε con n ≥ N' tenemos que |w n - l| ≤ ε
+  Como ∀ n ≥ N,  |u n - l| ≤ ε yy n ≥ N  tenemos que |u n - l| ≤ ε
+  Como ∀ n ≥ N', |w n - l| ≤ ε yy n ≥ N' tenemos que |w n - l| ≤ ε
   Probemos que |v n - l| ≤ ε
   Primero probemos que -ε ≤ v n - l
   Calc -ε ≤ u n - l pues |u n - l| ≤ ε
@@ -115,7 +115,7 @@ Demostración:
 QED
 
 open Verbose.Named in
-Ejemplo "A reformulation of the convergence definition."
+Ejemplo "Una reformulación de la definición de convergencia en sucesiones."
   Dado: (u : ℕ → ℝ) (l : ℝ)
   Asumimos:
   Conclusión: (u converge a l) ⇔ ∀ ε > 0, ∃ N, ∀ n ≥ N, |u n - l| < ε
@@ -139,7 +139,7 @@ Demostración:
 QED
 
 
-Ejemplo "Uniqueness of limits."
+Ejemplo "Unicidad del límite."
   Dado: (u : ℕ → ℝ) (l l' : ℝ)
   Asumimos: (h : u converge a l) (h': u converge a l')
   Conclusión: l = l'
@@ -157,11 +157,11 @@ Demostración:
   Calc |l - l'| = |(l-u (max N N')) + (u (max N N') -l')|  por cálculo
   _             ≤ |l - u (max N N')| + |u (max N N') - l'| por abs_add_le
   _             = |u (max N N') - l| + |u (max N N') - l'| por abs_sub_comm
-  _             ≤  ε/2 + ε/2                               por hN₁ con hN'₁
+  _             ≤  ε/2 + ε/2                               por hN₁ yy hN'₁
   _             = ε                                        por cálculo
 QED
 
-Ejemplo "An increasing sequence having a finite supremum tends to it."
+Ejemplo "Toda sucesión creciente con un supremo tiende a este mismo."
   Dado: (u : ℕ → ℝ) (M : ℝ)
   Asumimos: (h : M es un supremo de u) (h' : u es creciente)
   Conclusión: u converge a M
@@ -174,7 +174,7 @@ Demostración:
   Sea n ≥ n₀
   Por inf_M aplicado a n tenemos (inf_M' : u n ≤ M)
   Primero probemos que -ε ≤ u n - M
-  · Por h' aplicado a n₀ con n usando n_ge tenemos h'' : u n₀ ≤ u n
+  · Por h' aplicado a n₀ yy n usando n_ge tenemos h'' : u n₀ ≤ u n
     Calc
       -ε ≤ u n₀ - M por hn₀
       _  ≤ u n - M por h''

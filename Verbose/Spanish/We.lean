@@ -32,7 +32,7 @@ pure "No es concluyente."
 elab ("Concluimos "<|> "Concluyamos ") " por " e:maybeAppliedES : tactic => do
   concludeTac (← maybeAppliedESToTerm e)
 
-elab ("Combinamos "<|> "Combinemos ") prfs:sepBy(term, " con ") : tactic => do
+elab ("Combinamos "<|> "Combinemos ") prfs:sepBy(term, " yy ") : tactic => do
   combineTac prfs.getElems
 
 implement_endpoint (lang := es) computeFailed (goal : MessageData) : TacticM MessageData :=
@@ -163,7 +163,7 @@ example (h : True → True) : True := by
   trivial
 
 example (h : ∀ _n _k : ℕ, True) : True := by
-  Concluimos por h aplicado a 0 con 1
+  Concluimos por h aplicado a 0 yy 1
 
 example (a b : ℕ) (h : a < b) : a ≤ b := by
   Concluimos por h
@@ -172,13 +172,13 @@ example (a b c : ℕ) (h : a < b ∧ a < c) : a ≤ b := by
   Concluimos por h
 
 example (a b c : ℕ) (h : a ≤ b) (h' : b ≤ c) : a ≤ c := by
-  Combinamos h con h'
+  Combinamos h yy h'
 
 example (a b c : ℤ) (h : a = b + c) (h' : b - a = c) : c = 0 := by
-  Combinamos h con h'
+  Combinamos h yy h'
 
 example (a b c : ℕ) (h : a ≤ b) (h' : b ≤ c ∧ a+b ≤ a+c) : a ≤ c := by
-  Combinamos h con h'
+  Combinamos h yy h'
 
 example (a b c : ℕ) (h : a = b) (h' : a = c) : b = c := by
   Reescribimos usando ← h
@@ -223,7 +223,7 @@ example (P Q : Prop) (h : P → Q) (h' : P) : Q := by
   Concluimos por h
 
 example (P Q R : Prop) (h : P → Q → R) (hP : P) (hQ : Q) : R := by
-  Concluimos por h aplicado a hP con hQ
+  Concluimos por h aplicado a hP yy hQ
 
 -- example (f : ℕ → ℕ) (a b : ℕ) (h : a = b) : f a = f b := by
 --   Usamos f en la hipótesis h

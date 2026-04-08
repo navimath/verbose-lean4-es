@@ -82,7 +82,7 @@ example (n : ℕ) : n + n + n = 3*n := by
 example (n : ℤ) (h : 0 < n) : True := by
   Hecho key : 0 < 2*n por
     linarith only [h]
-  Hecho keybis : 0 < 2*n pues mul_pos aplicado a zero_lt_two con h
+  Hecho keybis : 0 < 2*n pues mul_pos aplicado a zero_lt_two yy h
   trivial
 end
 
@@ -115,7 +115,7 @@ example (n : ℕ) : n + n + n = 3*n := by
 example (n : ℤ) (h : 0 < n) : True := by
   Hecho: 0 < 2*n por
     linarith only [h]
-  Hecho: 0 < 2*n pues mul_pos aplicado a zero_lt_two con h
+  Hecho: 0 < 2*n pues mul_pos aplicado a zero_lt_two yy h
   trivial
 
 lemma foo_ex : ∃ N : Nat, True := by simp
