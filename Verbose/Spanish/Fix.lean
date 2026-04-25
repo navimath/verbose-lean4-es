@@ -50,7 +50,7 @@ implement_endpoint (lang := es) noHypIntro : CoreM String :=
 pure "Aquí no puedes introducir una hipótesis."
 
 implement_endpoint (lang := es) negationByContra (hyp : Format) : CoreM String :=
-pure s!"El objetivo ya es una negación, demostrarlo por abusurdo no cambia nada. \
+pure s!"El objetivo ya es una negación, proceder por contradicción no cambia nada. \
  En su lugar, puedes asumir directamente {hyp}."
 
 implement_endpoint (lang := es) wrongNegation : CoreM String :=
