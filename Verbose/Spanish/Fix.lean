@@ -44,7 +44,7 @@ macro_rules
   | `(tactic| Sea $decl:fixDecl $decls:fixDecl*) => `(tactic| Sea₁ $decl; Sea $decls:fixDecl*)
 
 implement_endpoint (lang := es) noObjectIntro : CoreM String :=
-pure "No puedes introducir aquí un objeto."
+pure "Aquí no puedes introducir un objeto."
 
 implement_endpoint (lang := es) noHypIntro : CoreM String :=
 pure "No puedes introducir aquí una hipótesis."
