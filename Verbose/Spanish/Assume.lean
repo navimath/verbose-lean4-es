@@ -20,7 +20,7 @@ elab_rules : tactic
 
 namespace Verbose.Named
 scoped syntax "Supongamos " (colGt assumeDecl)+ : tactic
-scoped syntax "Supongamos " "para una contradicción " (colGt assumeDecl) : tactic
+scoped syntax "Supongamos " ("para una contradicción " <|> "por contradicción ") (colGt assumeDecl) : tactic
 
 scoped macro_rules
   | `(tactic| Supongamos $decl:assumeDecl) => `(tactic| Supongamos₁ $decl)
@@ -42,7 +42,7 @@ example (n : Nat) : 0 < n → True := by
   trivial
 
 example : ∀ n > 0, true := by
-  success_if_fail_with_msg "No puedes introducir aquí una hipótesis."
+  success_if_fail_with_msg "Aquí no puedes introducir una hipótesis."
     Supongamos n
   intro n
   Supongamos H : n > 0
@@ -54,10 +54,15 @@ example (P Q : Prop) (h : ¬ Q → ¬ P) : P → Q := by
   Supongamos para  una contradicción hnQ :¬ Q
   exact h hnQ hP
 
+example (P Q : Prop) (h : ¬ Q → ¬ P) : P → Q := by
+  Supongamos hP
+  Supongamos para una contradicción hnQ : ¬ Q
+  exact h hnQ hP
+
 
 example (P Q : Prop) (h : ¬ Q → ¬ P) : P → Q := by
   Supongamos hP
-  Supongamos para  una contradicción hnQ : ¬ Q
+  Supongamos por contradicción hnQ : ¬ Q
   exact h hnQ hP
 
 
@@ -74,7 +79,7 @@ private def foo_bar (P : Nat → Prop) := ∀ x, P x
 
 example (P : Nat → Prop) (h : ¬ ∃ x, ¬ P x) : foo_bar P := by
   success_if_fail_with_msg
-    "Esto no es lo que se debe suponer para llegar a una contradicción, incluso después de haber aplicado la negación."
+    "Para proceder por contradicción, debes suponer la negación del objetivo."
     Supongamos para  una contradicción H : ∃ x, ¬ P x
   unfold foo_bar
   Supongamos para  una contradicción H : ∃ x, ¬ P x
@@ -88,7 +93,7 @@ example (P : Nat → Prop) (h : ¬ ∃ x, ¬ P x) : foo_bar P := by
 
 example : 0 ≠ 1 := by
   success_if_fail_with_msg
-    "El objetivo ya es una negación, demostrarlo por abusurdo no cambia nada. En su lugar, puedes asumir directamente 0 = 1."
+    "El objetivo ya es una negación, proceder por contradicción no cambia nada. En su lugar, puedes asumir directamente 0 = 1."
     Supongamos para  una contradicción h : 0 = 1
   norm_num
 
@@ -112,7 +117,7 @@ namespace Verbose.NameLess
 syntax "Supongamos que " (colGt term) : tactic
 syntax "Supongamos que " (colGt term " yy " term) : tactic
 syntax "Supongamos que " (colGt term ", " term " yy " term) : tactic
-syntax "Supongamos " "para una contradicción que " (colGt term) : tactic
+syntax "Supongamos " ("para una contradicción que " <|> "por contradicción que ") (colGt term) : tactic
 
 elab_rules : tactic
   | `(tactic| Supongamos que $t) => withMainContext do
@@ -144,6 +149,13 @@ elab_rules : tactic
     let name ← mk_hyp_name t e
     forContradiction name t
 
+example : ∀ n > 0, n = n := by
+  Supongamos por contradicción que ∃ n > 0, n ≠ n
+  tauto
+
+example : ∀ n > 0, n = n := by
+  Supongamos para una contradicción que ∃ n > 0, n ≠ n
+  tauto
 
 example (P : Prop) : P → True := by
 /-   success_if_fail_with_msg "El término
@@ -152,7 +164,7 @@ example (P : Prop) : P → True := by
   P"
     Supongamos que True -/
   Supongamos que P
-  success_if_fail_with_msg "No puedes introducir aquí una hipótesis."
+  success_if_fail_with_msg "Aquí no puedes introducir una hipótesis."
     Supongamos que True
   trivial
 

@@ -4,10 +4,10 @@ import Verbose.Spanish.Common
 open Lean Verbose.Spanish
 
 
-elab "Por " e:maybeAppliedES " tenemos " colGt news:newStuffES : tactic => do
+elab "Por " e:maybeAppliedES (" tenemos " <|> " se tiene ") colGt news:newStuffES : tactic => do
 obtainTac (← maybeAppliedESToTerm e) (newStuffESToArray news)
 
-elab "Por " e:maybeAppliedES " escogemos " colGt news:newStuffES : tactic => do
+elab "Por " e:maybeAppliedES " podemos elegir " colGt news:newStuffES : tactic => do
 chooseTac (← maybeAppliedESToTerm e) (newStuffESToArray news)
 
 elab "Por " e:maybeAppliedES " basta probar " "que "? colGt arg:term : tactic => do
@@ -16,9 +16,9 @@ bySufficesTac (← maybeAppliedESToTerm e) #[arg]
 elab "Por " e:maybeAppliedES " basta probar " "que "? colGt args:sepBy(term, " yy ") : tactic => do
 bySufficesTac (← maybeAppliedESToTerm e) args.getElems
 
-elab "asunción" : tactic => assumption'
+elab "hipótesis" : tactic => assumption'
 
-macro "hipótesis" : term => `(by asunción)
+macro "hipótesis" : term => `(by hipótesis)
 
 lemma le_le_of_abs_le {α : Type*} [AddCommGroup α] [LinearOrder α] [IsOrderedAddMonoid α] {a b : α} : |a| ≤ b → -b ≤ a ∧ a ≤ b := abs_le.1
 
@@ -53,7 +53,7 @@ example (P : Nat → Prop) (h : ∀ n, P n) : P 0 := by
   exact h₀
 
 example (P : Nat → Nat → Prop) (h : ∀ n k, P n (k+1)) : P 0 1 := by
-  Por h aplicado a 0 yy 0 tenemos (h₀ : P 0 1)
+  Por h aplicado a 0 yy 0 se tiene (h₀ : P 0 1)
   exact h₀
 
 example (n : Nat) (h : ∃ k, n = 2*k) : True := by
@@ -77,15 +77,15 @@ example (n p q : ℕ) (h : n ≥ max p q) : True := by
   trivial
 
 noncomputable example (f : ℕ → ℕ) (h : ∀ y, ∃ x, f x = y) : ℕ → ℕ := by
-  Por h escogemos g tal que (H : ∀ (y : ℕ), f (g y) = y)
+  Por h podemos elegir g tal que (H : ∀ (y : ℕ), f (g y) = y)
   exact g
 
 noncomputable example (f : ℕ → ℕ) (A : Set ℕ) (h : ∀ y, ∃ x ∈ A, f x = y) : ℕ → ℕ := by
-  Por h escogemos g tal que (H : ∀ (y : ℕ), g y ∈ A) yy (H' : ∀ (y : ℕ), f (g y) = y)
+  Por h podemos elegir g tal que (H : ∀ (y : ℕ), g y ∈ A) yy (H' : ∀ (y : ℕ), f (g y) = y)
   exact g
 
 noncomputable example (f : ℕ → ℕ) (A : Set ℕ) (h : ∀ y, ∃ x ∈ A, f x = y) : ℕ → ℕ := by
-  Por h escogemos g tal que (H : ∀ (y : ℕ), g y + 0 ∈ A) yy (H' : ∀ (y : ℕ), f (g y) = y)
+  Por h podemos elegir g tal que (H : ∀ (y : ℕ), g y + 0 ∈ A) yy (H' : ∀ (y : ℕ), f (g y) = y)
   exact g
 
 example (P Q : Prop) (h : P → Q) (h' : P) : Q := by

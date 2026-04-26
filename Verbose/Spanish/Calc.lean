@@ -334,7 +334,7 @@ example (N : ℕ) (hN : N ≥ 3) : N ≥ (1 : ℝ) := by
     _ > 1 por cálculo
 
 example (x : ℝ) (p : ℕ) (h : x ≤ p) : x < (p + 1 : ℕ) := by
-  Calc x ≤ p ya que asunción
+  Calc x ≤ p por hipótesis
     _ < p + 1 por cálculo
 
 example (u : Nat → Nat) (h : ∀ n, u n = u 0)

@@ -32,8 +32,8 @@ Demostración:
   Sea n ≥ N
   Como ∀ x, |x - x₀| ≤ δ → |f x - f x₀| ≤ ε basta probar que |u n - x₀| ≤ δ
   Como ∀ n ≥ N, |u n - x₀| ≤ δ yy n ≥ N concluimos que |u n - x₀| ≤ δ
-  /- -- Forward reasoning variation
-  Como ∀ n ≥ N, |u n - x₀| ≤ δ yy n ≥ N tenemos that |u n - x₀| ≤ δ
+/-    -- Forward reasoning variation
+  Como ∀ n ≥ N, |u n - x₀| ≤ δ yy n ≥ N tenemos que |u n - x₀| ≤ δ
   Como ∀ x, |x - x₀| ≤ δ → |f x - f x₀| ≤ ε yy |u n - x₀| ≤ δ concluimos que |f (u n) - f x₀| ≤ ε -/
 QED
 

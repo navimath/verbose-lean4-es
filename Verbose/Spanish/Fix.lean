@@ -54,7 +54,7 @@ pure s!"El objetivo ya es una negación, proceder por contradicción no cambia n
  En su lugar, puedes asumir directamente {hyp}."
 
 implement_endpoint (lang := es) wrongNegation : CoreM String :=
-pure "Esto no es lo que se debe suponer para llegar a una contradicción, incluso después de haber aplicado la negación."
+pure "Para proceder por contradicción, debes suponer la negación del objetivo."
 
 macro_rules
 | `(ℕ) => `(Nat)
@@ -84,7 +84,7 @@ example : ∀ n > 0, ∀ k : ℕ, ∀ l ∈ (Set.univ : Set ℕ), true := by
 set_option linter.unusedVariables false in
 example : ∀ n > 0, ∀ k : ℕ, ∀ l ∈ (Set.univ : Set ℕ), true := by
   Sea n
-  success_if_fail_with_msg "No puedes introducir aquí un objeto."
+  success_if_fail_with_msg "Aquí no puedes introducir un objeto."
     Sea h
   intro hn
   Sea k (l ∈ (Set.univ : Set ℕ)) -- same elaboration issue here
