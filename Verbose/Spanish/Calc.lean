@@ -75,7 +75,7 @@ namespace Lean.Elab.Tactic
 open Meta Verbose Spanish
 
 declare_syntax_cat CalcFirstStepES
-syntax ppIndent(colGe term (" por "  sepBy(maybeAppliedES, " yy "))?) : CalcFirstStepES
+syntax ppIndent(colGe term (" por "  sepBy1(maybeAppliedES, ",", AndES))?) : CalcFirstStepES
 /- syntax ppIndent(colGe term (" por hipótesis")?) : CalcFirstStepES -/
 syntax ppIndent(colGe term (" por cálculo")?) : CalcFirstStepES
 syntax ppIndent(colGe term (" ya que " factsES)?) : CalcFirstStepES
@@ -84,7 +84,7 @@ syntax ppIndent(colGe term (" usando " tacticSeq)?) : CalcFirstStepES
 
 -- enforce indentation of calc steps so we know when to stop parsing them
 declare_syntax_cat CalcStepES
-syntax ppIndent(colGe term " por " sepBy(maybeAppliedES, " yy ")) : CalcStepES
+syntax ppIndent(colGe term " por " sepBy1(maybeAppliedES, ",", AndES)) : CalcStepES
 /- syntax ppIndent(colGe term " por hipótesis") : CalcStepES -/
 syntax ppIndent(colGe term " por cálculo") : CalcStepES
 syntax ppIndent(colGe term " ya que " factsES) : CalcStepES
@@ -104,8 +104,11 @@ def convertFirstCalcStepES (step : TSyntax `CalcFirstStepES) : TermElabM (TSynta
     pure (← run t btk ctk `(tacticSeq| asunción), none) -/
   | `(CalcFirstStepES|$t:term por%$btk cálculo%$ctk) =>
     pure (← run t btk ctk `(tacticSeq| computeCalcTac), none)
-  | `(CalcFirstStepES|$t:term por%$tk $prfs yy*) => do
-    let prfTs ← liftMetaM <| prfs.getElems.mapM maybeAppliedESToTerm
+/-   | `(CalcFirstStepES|$t:term por%$tk $prfs:term) => do
+    let prfT ← liftMetaM <| pure prfs
+    pure (← run t tk none `(tacticSeq| fromCalcTac $prfT), none) -/
+  | `(CalcFirstStepES|$t:term por%$tk $[$prfs],*) => do
+    let prfTs ← liftMetaM <| prfs.mapM maybeAppliedESToTerm
     pure (← run t tk none `(tacticSeq| fromCalcTac $prfTs,*), none)
   | `(CalcFirstStepES|$t:term ya que%$tk $factsES:factsES) =>
     pure (← run t tk none `(tacticSeq|comoCalcTac%$tk $factsES), none)
@@ -130,8 +133,11 @@ def convertCalcStepES (step : TSyntax `CalcStepES) : TermElabM (TSyntax ``calcSt
     pure (← run t btk ctk `(tacticSeq| asunción), none) -/
   | `(CalcStepES|$t:term por%$btk cálculo%$ctk) =>
     pure (← run t btk ctk `(tacticSeq| computeCalcTac), none)
-  | `(CalcStepES|$t:term por%$tk $prfs yy*) => do
-    let prfTs ← liftMetaM <| prfs.getElems.mapM maybeAppliedESToTerm
+/-   | `(CalcFirstStepES|$t:term por%$tk $prfs:term) => do
+    let prfT ← liftMetaM <| pure prfs
+    pure (← run t tk none `(tacticSeq| fromCalcTac $prfT), none) -/
+  | `(CalcStepES|$t:term por%$tk $[$prfs],*) => do
+    let prfTs ← liftMetaM <| prfs.mapM maybeAppliedESToTerm
     pure (← run t tk none `(tacticSeq| fromCalcTac $prfTs,*), none)
   | `(CalcStepES|$t:term ya que%$tk $factsES:factsES) =>
     pure (← run t tk none `(tacticSeq|comoCalcTac%$tk $factsES), none)
@@ -219,15 +225,15 @@ example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
 
 example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
   Calc a + 0 + c = a + c por cálculo
-  _              ≤ b + d ya que a ≤ b yy c ≤ d
+  _              ≤ b + d ya que a ≤ b ,y c ≤ d
 
 example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
   Calc a + 0 + c = a + c por cálculo
-  _              ≤ b + d por h yy h'
+  _              ≤ b + d por h ,y h'
 
 example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
   Calc a + 0 + c = a + c por cálculo
-  _              ≤ b + d por h yy h'
+  _              ≤ b + d por h ,e h'
 
 def even_fun  (f : ℝ → ℝ) := ∀ x, f (-x) = f x
 

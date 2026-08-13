@@ -13,7 +13,7 @@ chooseTac (← maybeAppliedESToTerm e) (newStuffESToArray news)
 elab "Por " e:maybeAppliedES " basta probar " "que "? colGt arg:term : tactic => do
 bySufficesTac (← maybeAppliedESToTerm e) #[arg]
 
-elab "Por " e:maybeAppliedES " basta probar " "que "? colGt args:sepBy(term, " yy ") : tactic => do
+elab "Por " e:maybeAppliedES " basta probar " "que "? colGt args:sepBy1(term, ",", AndES) : tactic => do
 bySufficesTac (← maybeAppliedESToTerm e) args.getElems
 
 elab "hipótesis" : tactic => assumption'
@@ -53,7 +53,7 @@ example (P : Nat → Prop) (h : ∀ n, P n) : P 0 := by
   exact h₀
 
 example (P : Nat → Nat → Prop) (h : ∀ n k, P n (k+1)) : P 0 1 := by
-  Por h aplicado a 0 yy 0 se tiene (h₀ : P 0 1)
+  Por h aplicado a 0 ,e 0 se tiene (h₀ : P 0 1)
   exact h₀
 
 example (n : Nat) (h : ∃ k, n = 2*k) : True := by
@@ -81,11 +81,11 @@ noncomputable example (f : ℕ → ℕ) (h : ∀ y, ∃ x, f x = y) : ℕ → �
   exact g
 
 noncomputable example (f : ℕ → ℕ) (A : Set ℕ) (h : ∀ y, ∃ x ∈ A, f x = y) : ℕ → ℕ := by
-  Por h podemos elegir g tal que (H : ∀ (y : ℕ), g y ∈ A) yy (H' : ∀ (y : ℕ), f (g y) = y)
+  Por h podemos elegir g tal que (H : ∀ (y : ℕ), g y ∈ A) ,e (H' : ∀ (y : ℕ), f (g y) = y)
   exact g
 
 noncomputable example (f : ℕ → ℕ) (A : Set ℕ) (h : ∀ y, ∃ x ∈ A, f x = y) : ℕ → ℕ := by
-  Por h podemos elegir g tal que (H : ∀ (y : ℕ), g y + 0 ∈ A) yy (H' : ∀ (y : ℕ), f (g y) = y)
+  Por h podemos elegir g tal que (H : ∀ (y : ℕ), g y + 0 ∈ A) ,e (H' : ∀ (y : ℕ), f (g y) = y)
   exact g
 
 example (P Q : Prop) (h : P → Q) (h' : P) : Q := by
@@ -101,14 +101,14 @@ example (P Q : Prop) (h : P → Q) (h' : P) : Q := by
   exact hipótesis
 
 example (P Q R : Prop) (h : P → R → Q) (hP : P) (hR : R) : Q := by
-  Por h basta probar que  P yy R
+  Por h basta probar que  P ,e R
   exact hP
   exact hR
 
 set_option linter.unusedVariables false in
 example (P Q : Prop) (h : ∀ n : ℕ, P → Q) (h' : P) : Q := by
   success_if_fail_with_msg "No se puede aplicar h 0 1."
-    Por h aplicado a 0 yy 1 basta probar que  P
+    Por h aplicado a 0 ,e 1 basta probar que  P
   Por h aplicado a 0 basta probar que  P
   exact h'
 
@@ -124,7 +124,7 @@ example {P Q R : ℕ → Prop} {n k l : ℕ} (h : ∀ k l, P k → Q l → R n) 
     R n := by
   success_if_fail_with_msg "También tienes que verificar Q ?l"
     Por h basta probar que  P k
-  Por h basta probar que  P k yy Q l
+  Por h basta probar que  P k ,e Q l
   exact hk
   exact hl
 

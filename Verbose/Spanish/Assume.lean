@@ -115,8 +115,8 @@ end Verbose.Named
 
 namespace Verbose.NameLess
 syntax "Supongamos que " (colGt term) : tactic
-syntax "Supongamos que " (colGt term " yy " term) : tactic
-syntax "Supongamos que " (colGt term ", " term " yy " term) : tactic
+syntax "Supongamos que " (colGt term AndES term) : tactic
+syntax "Supongamos que " (colGt term ", " term AndES term) : tactic
 syntax "Supongamos " ("para una contradicción que " <|> "por contradicción que ") (colGt term) : tactic
 
 elab_rules : tactic
@@ -124,14 +124,14 @@ elab_rules : tactic
      let e ← elabTerm t none
      let name ← mk_hyp_name t e
      Assume1 (introduced.typed (mkNullNode #[t]) name t)
-  | `(tactic| Supongamos que $t yy $s) => withMainContext do
+  | `(tactic| Supongamos que $t $_and:AndES $s) => withMainContext do
      let e ← elabTerm t none
      let name ← mk_hyp_name t e
      Assume1 (introduced.typed (mkNullNode #[t]) name t)
      let e ← elabTerm s none
      let name ← mk_hyp_name s e
      Assume1 (introduced.typed (mkNullNode #[s]) name s)
-  | `(tactic| Supongamos que $t, $s yy $r) => withMainContext do
+  | `(tactic| Supongamos que $t, $s $_and:AndES $r) => withMainContext do
      let e ← elabTerm t none
      let name ← mk_hyp_name t e
      Assume1 (introduced.typed (mkNullNode #[t]) name t)
@@ -169,11 +169,11 @@ example (P : Prop) : P → True := by
   trivial
 
 example (P Q : Prop) : P → Q → True := by
-  Supongamos que P yy Q
+  Supongamos que P ,y Q
   trivial
 
 example (P Q R : Prop) : P → Q → R → True := by
-  Supongamos que P, Q yy R
+  Supongamos que P, Q ,y R
   trivial
 
 end Verbose.NameLess
