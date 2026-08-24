@@ -6,7 +6,7 @@ namespace Verbose.Spanish
 
 open Lean Elab Tactic
 
-elab "Como " facts:factsES " se tiene " news:newObjectNameLessES : tactic => do
+elab "Como " facts:factsES " obtenemos " news:newObjectNameLessES : tactic => do
   let newsT ← newObjectNameLessESToTerm news
   let news_patt := newObjectNameLessESToRCasesPatt news
   let factsT := factsESToArray facts
@@ -19,7 +19,7 @@ def thenConcludeEStoTerm : TSyntax `thenConcludeES → Term
 | `(thenConcludeES|finalmente concluimos que $t:term) => t
 | _ => default
 
-elab "Como " facts:factsES (" se tiene " <|> "tenemos que") news:sepBy1(factsES, " luego ") concl?:(thenConcludeES)? : tactic =>
+elab "Como " facts:factsES (" se tiene que " <|> "tenemos que") news:sepBy1(factsES, " luego ") concl?:(thenConcludeES)? : tactic =>
   withMainContext do
   let newsArr := news.getElems
   let factsTArr := (#[facts] ++ newsArr).map factsESToArray
@@ -45,7 +45,7 @@ elab "basta probar que " newGoals:factsES : tactic => do
   let newGoalsT := factsESToArray newGoals
   sinceSufficesTac #[] newGoalsT
 
-elab "Decidimos en función de si " factL:term " o " factR:term : tactic => do
+elab "Distinguimos en casos según si " factL:term " o " factR:term : tactic => do
   -- dbg_trace s!"factL {factL}"
   -- dbg_trace s!"factR {factR}"
   sinceDiscussTac factL factR

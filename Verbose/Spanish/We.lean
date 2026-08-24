@@ -315,7 +315,7 @@ namespace Verbose.Spanish
 def f (n : ℕ) := 2*n
 
 example : f 2 = 4 := by
-  Desarrollamos  f
+  Desarrollamos f
   rfl
 
 example (h : f 2 = 4) : True → True := by

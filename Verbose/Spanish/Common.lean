@@ -208,7 +208,7 @@ def factsESToTypeTerm : TSyntax `factsES → MetaM Term
 | `(factsES| $x:term) => `($x)
 | `(factsES| $x:term $_and:AndES $v) => `($x ∧ $v)
 | `(factsES| $x:term, $v:term $_and:AndES $z) => `($x ∧ $v ∧ $z)
-| _ => throwError "No se ha podido convertir la descripción de la nueva información en un término."
+| _ => throwError "No se ha podido convertir la información dada en un término.."
 
 /-- Convert an expression to a `maybeAppliedES` syntax object, in `MetaM`. -/
 def _root_.Lean.Expr.toMaybeAppliedES (e : Expr) : MetaM (TSyntax `maybeAppliedES) := do
@@ -282,10 +282,10 @@ implement_endpoint (lang := es) cannotExpand : CoreM String :=
 pure "No se ha podido expandir la cabeza del término."
 
 implement_endpoint (lang := es) doesntFollow (tgt : MessageData) : CoreM MessageData :=
-pure m!"La afirmación {tgt} no parece directamente derivable de al menos alguna de las hipótesis."
+pure m!"La afirmación {tgt} no parece directamente derivable de ninguna hipótesis local por sí sola."
 
 implement_endpoint (lang := es) couldNotProve (goal : Format) : CoreM String :=
 pure s!"No se pudo probar:\n{goal}"
 
 implement_endpoint (lang := es) failedProofUsing (goal : Format) : CoreM String :=
-pure s!"No se ha podido probar {goal}\n usando la información dada."
+pure s!"Con la información dada, no se ha podido probar:\n{goal}"

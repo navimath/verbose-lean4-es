@@ -22,7 +22,7 @@ syntax ": " term : explicitStmtES
 
 def toStmt (e : Lean.TSyntax `explicitStmtES) : Lean.Term := ⟨e.raw[1]!⟩
 
-elab "Probemos que " witness:term " basta " stmt:(explicitStmtES)?: tactic => do
+elab "Probemos que se cumple para " witness:term stmt:(explicitStmtES)?: tactic => do
   useTac witness (stmt.map toStmt)
 
 elab "Primero probemos que " stmt:term : tactic =>

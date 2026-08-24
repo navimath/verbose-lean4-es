@@ -121,7 +121,7 @@ implement_endpoint (lang := es) helpSinceImplicationSuggestion (stmt goalS leS :
     pushCom "Si ya tienes una prueba de {← le.fmt} puedes probar con:"
     pushTac `(tactic|Como $stmt:term ,y $(← le.stx):term concluimos que $goalS)
   else do
-    pushCom "la premisa de está implicación es {← le.fmt}"
+    pushCom "La premisa de está implicación es {← le.fmt}"
     pushCom "Si tienes una prueba de {← le.fmt}"
     pushCom "Puedes usar esta hipótesis con:"
     pushTac `(tactic|Como $stmt:term ,y $leS:term tenemos que $(← re.stx):term)
@@ -147,9 +147,9 @@ implement_endpoint (lang := es) helpSinceEquivalenceSuggestion
   pushTac `(tactic|Como $stmt:term basta probar que ?_)
   pushCom "reemplazando el signo de interrogación por el nuevo objetivo ."
   flush
-  pushCom "Estas sustituciones también se pueden derivar de algunas de las hipótesis actuales con:"
+  pushCom "Estas sustituciones también se pueden aplicar en una afirmación que se derive de alguna de las hipótesis actuales con:"
   pushTac `(tactic|Como $stmt:term ,y ?_ tenemos que ?_)
-  pushCom "reemplzando el primer signo de interrogación por la información que quieras sustituir, luego sustituye el segundo por el nuevo dato obtenido."
+  pushCom "reemplazando el primer signo de interrogación por la información que quieras sustituir, luego sustituye el segundo por el nuevo dato obtenido."
 
 implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : Bool) (l r : String) :
     SuggestionM Unit := do
@@ -171,7 +171,7 @@ implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : 
     pushCom "o"
     pushTac `(tactic|Reescribimos usando ← $hyp.ident:ident en la hipótesis $hyp'.ident:ident)
     flush
-    pushCom "Puede usarse en algún cálculo o combinación linear con:"
+    pushCom "Puede usarse en algún cálculo o combinación lineal con:"
     pushTac `(tactic|Combinemos [$hyp.ident:term, ?_])
     pushCom "sustituyendo el signo de interrogación por uno o varios términos que demuestren las igualdades."
 
@@ -199,7 +199,7 @@ implement_endpoint (lang := es) helpIneqSuggestion (hyp : Name) (closes : Bool) 
     pushCom "Se puede usar con:"
     pushTac `(tactic|Concluimos por $hyp.ident:ident)
   else do
-    pushCom "Puede usarse en algún cálculo o combinación linear con:"
+    pushCom "Puede usarse en algún cálculo o combinación lineal con:"
     pushTac `(tactic|Combinemos [$hyp.ident:term, ?_])
     pushCom "sustituyendo el signo de interrogación por uno o varios términos que demuestren igualdades o desigualdades."
 
@@ -211,67 +211,67 @@ implement_endpoint (lang := es) helpSinceIneqSuggestion (hyp : Name) (stmt goal 
     pushTac `(tactic|Como $stmt:term concluimos que  $goal)
   else do
     flush
-    pushCom "Puede usarse en algún cálculo o combinación linear con:"
+    pushCom "Puede usarse en algún cálculo o combinación lineal con:"
     pushTac `(tactic| Como $stmt:term ,y ?_ concluimos que  $goal)
     pushCom "sustituyendo el signo de interrogación por uno o varios términos que demuestren igualdades o desigualdades."
 
 implement_endpoint (lang := es) helpMemInterSuggestion (hyp h₁ h₂ : Name) (elemS p₁S p₂S : Term) :
     SuggestionM Unit := do
-  pushCom "La hipótesis {hyp} pertenece a una intersección"
+  pushCom "La hipótesis {hyp} afirma pertenencia a una intersección"
   pushCom "Se puede usar con:"
   pushTac `(tactic|Por $hyp.ident:term tenemos ($h₁.ident : $elemS ∈ $p₁S) ($h₂.ident : $elemS ∈ $p₂S))
   pushComment <| libres [h₁.ident, h₂.ident]
 
 implement_endpoint (lang := es) helpSinceMemInterSuggestion (stmt : Term) (hyp : Name) (mem₁ mem₂ : Term) :
     SuggestionM Unit := do
-  pushCom "La hipótesis {hyp} pertenece a una intersección"
+  pushCom "La hipótesis {hyp} afirma pertenencia a una intersección"
   pushCom "Se puede usar con:"
   pushTac `(tactic|Como $stmt:term tenemos que $mem₁:term ,y $mem₂)
 
 implement_endpoint (lang := es) helpMemUnionSuggestion (hyp : Name) :
     SuggestionM Unit := do
-  pushCom "La hipótesis {hyp} pertenece a una unión"
+  pushCom "La hipótesis {hyp} afirma pertenencia a una unión"
   pushCom "Se puede usar con:"
   pushTac `(tactic|Procedemos usando $hyp.ident)
 
 implement_endpoint (lang := es) helpSinceMemUnionSuggestion (elemS leS reS : Term) (hyp : Name) :
     SuggestionM Unit := do
-  pushCom "La hipótesis {hyp} pertenece a una unión"
+  pushCom "La hipótesis {hyp} afirma pertenencia a una unión"
   pushCom "Se puede usar con:"
   pushTac `(tactic|Decidimos en función de si $elemS ∈ $leS o $elemS ∈ $reS)
 
 implement_endpoint (lang := es) helpGenericMemSuggestion (hyp : Name) : SuggestionM Unit := do
-  pushCom "La hipótesis {hyp} is una relación de pertenencia."
+  pushCom "La hipótesis {hyp} es una relación de pertenencia."
 
 implement_endpoint (lang := es) helpContradictionSuggestion (hypId : Ident) : SuggestionM Unit := do
-  pushComment <| "¡Esta hipótesis es una contradicción!"
-  pushCom "Se puede deducir cualquier cosa:"
+  pushComment <| "Esta hipótesis es una contradicción."
+  pushCom "Se puede deducir cualquier cosa con:"
   pushTac `(tactic|(Probemos que hay una contradicción
                     Concluimos por $hypId:ident))
 
 implement_endpoint (lang := es) helpSinceContradictionSuggestion
      (stmt goal : Term) : SuggestionM Unit := do
-  pushComment <| "¡Esta hipótesis es una contradicción!"
-  pushCom "Puedes deducir el objetivo de ella:"
+  pushComment <| "Esta hipótesis es una contradicción."
+  pushCom "Puedes deducir el objetivo de ella con:"
   pushTac `(tactic|Como $stmt:term concluimos que  $goal)
 
 implement_endpoint (lang := es) helpSubsetSuggestion (hyp x hx hx' : Name)
     (r : Expr) (l ambientTypePP : Format) : SuggestionM Unit := do
-  pushCom "La hipótesis {hyp} demuestra la inclusión de {l} en {← r.fmt}."
+  pushCom "La hipótesis {hyp} afirma la inclusión de {l} en {← r.fmt}."
   pushCom "Se puede usar con:"
   pushTac `(tactic| Por $hyp.ident:ident aplicado a $x.ident usando $hx.ident tenemos $hx'.ident:ident : $x.ident ∈ $(← r.stx))
-  pushCom "donde {x} es {describe ambientTypePP} y {hx} demostrando que {x} ∈ {l}."
+  pushCom "donde {x} es {describe ambientTypePP} y {hx} demuestra que {x} ∈ {l}."
   pushComment <| libre hx'.ident
 
 implement_endpoint (lang := es) helpSinceSubsetSuggestion (hyp x : Name) (stmt new : Term)
     (l r : Expr) (ambientTypePP : Format) : SuggestionM Unit := do
-  pushCom "La hipótesis {hyp} demuestra la inclusión de {← l.fmt} in {← r.fmt}."
+  pushCom "La hipótesis {hyp} afirma la inclusión de {← l.fmt} en {← r.fmt}."
   pushCom "Se puede usar con:"
   pushTac `(tactic| Como $stmt:term ,y $x.ident ∈ $(← l.stx) tenemos que $new:term)
   pushCom "donde {x} es {describe ambientTypePP}"
 
 implement_endpoint (lang := es) assumptionClosesSuggestion (hypId : Ident) : SuggestionM Unit := do
-  pushCom "Esta hipótesis es exactamente lo qué se necesita probar"
+  pushCom "Esta hipótesis es exactamente lo que se necesita probar"
   pushCom "Se puede usar con:"
   pushTac `(tactic|Concluimos por $hypId:ident)
 
@@ -298,7 +298,7 @@ implement_endpoint (lang := es) helpSinceForAllRelExistsRelSuggestion (stmt :
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
   pushTac `(tactic|Como $stmt:term ,y $stmtn₀ se tiene $var_name'.ident:ident tal que $ineqS ,y $p'S)
-  pushCom "donde {n₀} es {describe t} luego la relación {stmtn₀Str} se sigue inmediatamente por alguna hipótesis."
+  pushCom "donde {n₀} es {describe t} y la relación {stmtn₀Str} se sigue inmediatamente por alguna hipótesis."
   pushComment <| libre var_name'.ident
 
 implement_endpoint (lang := es) helpForAllRelExistsSimpleSuggestion (hyp n' hn' n₀ hn₀ : Name)
@@ -332,7 +332,7 @@ implement_endpoint (lang := es) helpSinceForAllRelGenericSuggestion (stmt : Term
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
   pushTac `(tactic|Como $stmt:term ,y $stmtn₀ tenemos que $pS:term)
-  pushCom "donde {n₀} es {describe t} luego {stmtn₀Str} se sigue inmediatamente de alguna hipótesis."
+  pushCom "donde {n₀} es {describe t} y {stmtn₀Str} se sigue inmediatamente de alguna hipótesis."
 
 implement_endpoint (lang := es) helpForAllSimpleExistsRelSuggestion (hyp var_name' nn₀ : Name)
     (headDescr : String) (t : Format) (hn'S ineqIdent : Ident) (ineqS p'S : Term) :
