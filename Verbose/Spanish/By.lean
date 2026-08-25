@@ -4,7 +4,7 @@ import Verbose.Spanish.Common
 open Lean Verbose.Spanish
 
 
-elab "Por " e:maybeAppliedES (" tenemos " <|> " se tiene ") colGt news:newStuffES : tactic => do
+elab "Por " e:maybeAppliedES (" tenemos " <|> " obtenemos ") colGt news:newStuffES : tactic => do
 obtainTac (← maybeAppliedESToTerm e) (newStuffESToArray news)
 
 elab "Por " e:maybeAppliedES " podemos elegir " colGt news:newStuffES : tactic => do
@@ -53,11 +53,11 @@ example (P : Nat → Prop) (h : ∀ n, P n) : P 0 := by
   exact h₀
 
 example (P : Nat → Nat → Prop) (h : ∀ n k, P n (k+1)) : P 0 1 := by
-  Por h aplicado a 0 ,e 0 se tiene (h₀ : P 0 1)
+  Por h aplicado a 0 ,e 0 obtenemos (h₀ : P 0 1)
   exact h₀
 
 example (n : Nat) (h : ∃ k, n = 2*k) : True := by
-  Por h tenemos k tal que (H : n = 2*k)
+  Por h obtenemos k tal que (H : n = 2*k)
   trivial
 
 example (n : Nat) (h : ∃ k, n = 2*k) : True := by

@@ -36,9 +36,9 @@ elab ("Combinamos "<|> "Combinemos ") prfs:sepBy1(term, ",", AndES) : tactic => 
   combineTac prfs.getElems
 
 implement_endpoint (lang := es) computeFailed (goal : MessageData) : TacticM MessageData :=
-  pure m!"El objetivo {goal} no parece derivarse de ningún cálculo sin usar hipótesis locales."
+  pure m!"El objetivo {goal} no parece derivarse de ningún desarrollo sin usar hipótesis locales."
 
-elab ("Calculemos " <|> "Calculamos ") loc:(locationES)? : tactic => do
+elab ("Desarrollemos " <|> "Desarrollamos ") loc:(locationES)? : tactic => do
 let loc ← loc.mapM locationES_to_location
 computeTac loc
 
@@ -66,7 +66,7 @@ elab ("Renombramos "<|> "Renombremos ") old:ident " como " new:ident loc:(locati
 implement_endpoint (lang := es) unfoldResultSeveralLoc : CoreM String :=
 pure "Solo se puede especificar el despliegue cuando el cambio se realiza en una única ubicación."
 
-elab ("Desarrollamos "<|> "Desarrollemos ") tgt:ident loc:(locationES)? new:(becomesES)? : tactic => do
+elab ("Desplegamos " <|> "Despleguemos ") tgt:ident loc:(locationES)? new:(becomesES)? : tactic => do
   let loc? ← loc.mapM locationES_to_location
   let new? := (new.map extractBecomesES)
   unfoldTac tgt loc? new?
@@ -124,30 +124,30 @@ example (P : ℕ → Prop) (h : ∀ n, P n) : P 0 := by
   Concluimos por h
 
 example {a b : ℕ}: a + b = b + a := by
-  Calculamos
+  Desarrollamos
 
 example {a : ℕ}: 2*a + 1 ≥ a + 1 := by
-  Calculemos
+  Desarrollemos
 
 example {a b : ℕ} (h : a + b - a = 0) : b = 0 := by
-  Calculemos en la hipótesis h
+  Desarrollemos en la hipótesis h
   Concluimos por h
 
 addAnonymousComputeLemma abs_sub_le
 addAnonymousComputeLemma abs_sub_comm
 
 example {x y : ℝ} : |x - y| = |y - x| := by
-  Calculemos
+  Desarrollemos
 
 example {x y z : ℝ} : |x - y| ≤ |x - z| + |z - y| := by
-  Calculemos
+  Desarrollemos
 
 example {x y z : ℝ} : 2*|x - y| + 3 ≤ 2*(|x - z| + |z - y|) + 3 := by
-  Calculemos
+  Desarrollemos
 
 example (a : ℝ) (h : a ≤ 3) : a + 5 ≤ 3 + 5 := by
-  success_if_fail_with_msg "El objetivo a + 5 ≤ 3 + 5 no parece derivarse de ningún cálculo sin usar hipótesis locales."
-    Calculemos
+  success_if_fail_with_msg "El objetivo a + 5 ≤ 3 + 5 no parece derivarse de ningún desarrollo sin usar hipótesis locales."
+    Desarrollemos
   rel [h]
 
 variable (k : Nat)
@@ -315,11 +315,11 @@ namespace Verbose.Spanish
 def f (n : ℕ) := 2*n
 
 example : f 2 = 4 := by
-  Desarrollamos f
+  Desplegamos f
   rfl
 
 example (h : f 2 = 4) : True → True := by
-  Desarrollamos f en la hipótesis h
+  Desplegamos f en la hipótesis h
   guard_hyp h :ₛ 2*2 = 4
   exact id
 
@@ -328,13 +328,13 @@ example (h : f 2 = 4) : True → True := by
   2 * 2 = 4
 not
   2 * 2 = 5"
-    Desarrollamos f en la hipótesis h que se convierte en 2*2 = 5
+    Desplegamos f en la hipótesis h que se convierte en 2*2 = 5
   success_if_fail_with_msg "hypothesis h has type
   2 * 2 = 4
 not
   Verbose.Spanish.f 2 = 4"
-    Desarrollamos f en la hipótesis h que se convierte en f 2 = 4
-  Desarrollamos f en la hipótesis h que se convierte en 2*2 = 4
+    Desplegamos f en la hipótesis h que se convierte en f 2 = 4
+  Desplegamos f en la hipótesis h que se convierte en 2*2 = 4
   exact id
 
 set_option linter.unusedTactic false

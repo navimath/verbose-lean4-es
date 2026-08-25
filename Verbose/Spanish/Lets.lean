@@ -63,11 +63,11 @@ example : 1 + 1 = 2 := by
   rfl
 
 example : ∃ k : ℕ, 4 = 2*k := by
-  Probemos que 2 basta
+  Probemos que se cumple para 2
   rfl
 
 example : ∃ k : ℕ, 4 = 2*k := by
-  Probemos que 2 basta: 4 = 2*2
+  Probemos que se cumple para 2: 4 = 2*2
   rfl
 
 example : True ∧ True := by

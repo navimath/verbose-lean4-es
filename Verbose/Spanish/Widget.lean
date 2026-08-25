@@ -35,11 +35,11 @@ implement_endpoint (lang := es) mkSinceObtainTacStx (args : List Term) (news : L
       `(tactic|Como $facts tenemos que $stmt:term)
   | _ =>
       let newStuff ← listMaybeTypedIdentToNewObjectNameLessES news
-      `(tactic|Como $facts se tiene $newStuff:newObjectNameLessES)
+      `(tactic|Como $facts obtenemos $newStuff:newObjectNameLessES)
 
 implement_endpoint (lang := es) mkUseTacStx (wit : Term) : Option Term → MetaM (TSyntax `tactic)
-| some goal => `(tactic|Probemos que $wit basta : $goal)
-| none => `(tactic|Probemos que $wit basta)
+| some goal => `(tactic|Probemos que se cumple para $wit : $goal)
+| none => `(tactic|Probemos que se cumple para $wit)
 
 implement_endpoint (lang := es) mkSinceTacStx (facts : Array Term) (concl : Term) :
     MetaM (TSyntax `tactic) := do

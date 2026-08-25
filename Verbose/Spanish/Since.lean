@@ -61,38 +61,38 @@ example (f : ℝ → ℝ) (hf : ∀ x y, f x = f y → x = y) (x y : ℝ) (hxy :
   Como ∀ x y, f x = f y → x = y ,y f x = f y concluimos que x = y
 
 example (n : Nat) (h : ∃ k, n = 2*k) : True := by
-  Como ∃ k, n = 2*k se tiene k tal que n = 2*k
+  Como ∃ k, n = 2*k obtenemos k tal que n = 2*k
   trivial
 
 example (n : Nat) (h : ∃ k ≥ 1, n = 2*k) : True := by
-  Como ∃ k ≥ 1, n = 2*k se tiene k tal que k ≥ 1 ,y n = 2*k
+  Como ∃ k ≥ 1, n = 2*k obtenemos k tal que k ≥ 1 ,y n = 2*k
   trivial
 
 example (n : Nat) (h : ∃ k ≥ 1, n = 2*k ∧ k ≠ 0) : True := by
-  Como ∃ k ≥ 1, n = 2*k ∧ k ≠ 0 se tiene k tal que k ≥ 1, n = 2*k ,y k ≠ 0
+  Como ∃ k ≥ 1, n = 2*k ∧ k ≠ 0 obtenemos k tal que k ≥ 1, n = 2*k ,y k ≠ 0
   trivial
 
 example (n : Nat) (h : ∃ (k l : Nat), n = k + l) : True := by
-  Como ∃ (k l : Nat), n = k + l se tiene k ,y l tal que n = k + l
+  Como ∃ (k l : Nat), n = k + l obtenemos k ,y l tal que n = k + l
   trivial
 
 example (n : Nat) (h : ∃ (k l : Nat), n = k + l ∧ k = 1) : True := by
-  Como ∃ (k l : Nat), n = k + l ∧ k = 1 se tiene k ,y l tal que n = k + l ,y k = 1
+  Como ∃ (k l : Nat), n = k + l ∧ k = 1 obtenemos k ,y l tal que n = k + l ,y k = 1
   trivial
 
 example (n : Nat) (h : ∃ (k l : Nat), n = k + l ∧ k = 1 ∧ l = 2) : True := by
-  Como ∃ (k l : Nat), n = k + l ∧ k = 1 ∧ l = 2 se tiene k ,y l tal que n = k + l, k = 1
+  Como ∃ (k l : Nat), n = k + l ∧ k = 1 ∧ l = 2 obtenemos k ,y l tal que n = k + l, k = 1
     ,y l = 2
   trivial
 
 example (n N : Nat) (hn : n ≥ N) (h : ∀ n ≥ N, ∃ k, n = 2*k) : True := by
   success_if_fail_with_msg "Aquí n ≥ n no es necesario."
-    Como ∀ n ≥ N, ∃ k, n = 2*k, n ≥ N ,y n ≥ n se tiene k tal que n = 2*k
-  Como ∀ n ≥ N, ∃ k, n = 2*k ,y n ≥ N se tiene k tal que n = 2*k
+    Como ∀ n ≥ N, ∃ k, n = 2*k, n ≥ N ,y n ≥ n obtenemos k tal que n = 2*k
+  Como ∀ n ≥ N, ∃ k, n = 2*k ,y n ≥ N obtenemos k tal que n = 2*k
   trivial
 
 example (P Q : Prop) (h : P ∧ Q)  : Q := by
-  Como P ∧ Q se tiene P ,y Q
+  Como P ∧ Q se tiene que P ,y Q
   exact hQ
 
 example (P Q R S : Prop) (h : P ↔ R) (h' : (Q → R) → S) : (Q → P) → S := by
@@ -102,15 +102,15 @@ example (P Q R S : Prop) (h : P ↔ R) (h' : (Q → R) → S) : (Q → P) → S 
   Como R ↔ P ,y (Q → R) → S concluimos que (Q → P) → S
 
 example (n : Nat) (P : Nat → Prop) (Q : ℕ → ℕ → Prop) (h : P n ∧ ∀ m, Q n m) : Q n n := by
-  Como P n ∧ ∀ m, Q n m se tiene ∀ m, Q n m
+  Como P n ∧ ∀ m, Q n m se tiene que ∀ m, Q n m
   apply hQn
 
 example (n : ℕ) (hn : n > 2) (P : ℕ → Prop) (h : ∀ n ≥ 3, P n) : True := by
-  Como ∀ n ≥ 3, P n ,y n ≥ 3 se tiene P n
+  Como ∀ n ≥ 3, P n ,y n ≥ 3 se tiene que P n
   trivial
 
 example (n : ℕ) (hn : n > 2) (P Q : ℕ → Prop) (h : ∀ n ≥ 3, P n ∧ Q n) : True := by
-  Como ∀ n ≥ 3, P n ∧ Q n ,y n ≥ 3 se tiene P n ,y Q n
+  Como ∀ n ≥ 3, P n ∧ Q n ,y n ≥ 3 se tiene que P n ,y Q n
   trivial
 
 example (n : ℕ) (hn : n > 2) (P : ℕ → Prop) (h : ∀ n ≥ 3, P n) : P n := by
@@ -120,11 +120,11 @@ example (n : ℕ) (hn : n > 2) (P Q : ℕ → Prop) (h : ∀ n ≥ 3, P n ∧ Q 
   Como ∀ n ≥ 3, P n ∧ Q n ,y n ≥ 3 concluimos que P n
 
 example (n : ℕ) (hn : n > 2) (P Q : ℕ → Prop) (h : ∀ n ≥ 3, P n ∧ Q n) : True := by
-  Como ∀ n ≥ 3, P n ∧ Q n ,y n ≥ 3 se tiene P n
+  Como ∀ n ≥ 3, P n ∧ Q n ,y n ≥ 3 se tiene que P n
   trivial
 
 example (n : ℕ) (hn : n > 2) (P Q : ℕ → Prop) (h : ∀ n ≥ 3, P n) (h' : ∀ n ≥ 3, Q n) : True := by
-  Como ∀ n ≥ 3, P n, ∀ n ≥ 3, Q n ,y n ≥ 3 se tiene P n ,y Q n
+  Como ∀ n ≥ 3, P n, ∀ n ≥ 3, Q n ,y n ≥ 3 se tiene que P n ,y Q n
   trivial
 
 example (P Q : Prop) (h : P → Q) (h' : P) : Q := by
@@ -138,7 +138,7 @@ example (P Q R : Prop) (h : P → R → Q) (hP : P) (hR : R) : Q := by
 
 set_option linter.unusedTactic false in
 example (P : ℝ → Prop) (h : ∀ x > 0, P x)  : P 1 := by
-  Como 1 > 0 ,y ∀ x > 0, P x se tiene P 1
+  Como 1 > 0 ,y ∀ x > 0, P x se tiene que P 1
   guard_hyp_nums 3
   exact hP
 
@@ -170,8 +170,8 @@ P : ℕ → Prop
 x y : ℕ
 GivenFact_0 : x = y
 ⊢ P y"
-    Como x = y se tiene P y
-  Como x = y ,y P x se tiene P y
+    Como x = y se tiene que P y
+  Como x = y ,y P x se tiene que P y
   exact hPy
 
 example (P : ℕ → Prop) (x y : ℕ) (h : x = y) (h' : P x) : P y := by
@@ -198,27 +198,27 @@ example (f : ℕ → ℕ) (x y : ℕ) (h : x = y) : f x ≤ f y := by
 configureAnonymousCaseSplittingLemmas le_or_gt lt_or_gt_of_ne lt_or_eq_of_le eq_or_lt_of_le Classical.em
 
 example (P Q : Prop) (h : P ∨ Q) : True := by
-  Decidimos en función de si  P o Q
+  Distinguimos en casos según si  P o Q
   all_goals tauto
 
 example (P Q : Prop) (h : P ∨ Q) : True := by
-  Decidimos en función de si  Q o P
+  Distinguimos en casos según si  Q o P
   all_goals tauto
 
 example (P : Prop) : True := by
-  Decidimos en función de si  P o ¬ P
+  Distinguimos en casos según si  P o ¬ P
   all_goals tauto
 
 example (x y : ℕ) : True := by
-  Decidimos en función de si  x ≤ y o x > y
+  Distinguimos en casos según si  x ≤ y o x > y
   all_goals tauto
 
 example (x y : ℕ) : True := by
-  Decidimos en función de si  x = y o x ≠ y
+  Distinguimos en casos según si  x = y o x ≠ y
   all_goals tauto
 
 example (x y : ℕ) (h : x ≠ y) : True := by
-  Decidimos en función de si  x < y o x > y
+  Distinguimos en casos según si  x < y o x > y
   all_goals tauto
 
 example (ε : ℝ) (h : ε > 0) : ε ≥ 0 := by
@@ -236,11 +236,11 @@ max_le_iff.1
 configureAnonymousFactSplittingLemmas le_max_left le_max_right le_le_of_max_le' le_of_max_le_left le_of_max_le_right
 
 example (n a b : ℕ) (h : n ≥ max a b) : True := by
-  Como n ≥ max a b se tiene n ≥ a ,y n ≥ b
+  Como n ≥ max a b se tiene que n ≥ a ,y n ≥ b
   trivial
 
 example (n a b : ℕ) (h : n ≥ max a b) : True := by
-  Como n ≥ max a b se tiene n ≥ a
+  Como n ≥ max a b se tiene que n ≥ a
   trivial
 
 example (n a b : ℕ) (h : n ≥ max a b) (P : ℕ → Prop) (hP : ∀ n ≥ a, P n) : P n := by
@@ -248,7 +248,7 @@ example (n a b : ℕ) (h : n ≥ max a b) (P : ℕ → Prop) (hP : ∀ n ≥ a, 
 
 set_option linter.unusedVariables false in
 example (a b : ℕ) (P : ℕ → Prop) (h : ∀ n ≥ a, P n) : True := by
-  Como ∀ n ≥ a, P n ,y max a b ≥ a se tiene P (max a b)
+  Como ∀ n ≥ a, P n ,y max a b ≥ a se tiene que P (max a b)
   trivial
 
 example (a b : ℝ) (h : a + b ≤ 3) (h' : b ≥ 0) : b*(a + b) ≤ b*3 := by
@@ -288,7 +288,7 @@ example (P Q : Prop) (hPQ : P → Q) (hQP : Q → P) : P ↔ Q := by
   Como P → Q ,y Q → P concluimos que P ↔ Q
 
 example (P Q : Prop) (hPQ : P ↔ Q) : True := by
-  Como P ↔ Q se tiene P → Q ,y Q → P
+  Como P ↔ Q se tiene que P → Q ,y Q → P
   trivial
 
 private lemma test_abs_le_of_le_le {α : Type*} [AddCommGroup α] [LinearOrder α] [IsOrderedAddMonoid α] {a b : α}
@@ -335,14 +335,14 @@ example (P : Nat → Prop) (h : ∃ x, ¬ P x) : ¬ foo_bar P := by
   exact h
 
 example (P : Nat → Prop) (h : ¬ foo_bar P) : ∃ x, ¬ P x := by
-  Como ¬ foo_bar P se tiene ∃ x, ¬ P x
+  Como ¬ foo_bar P se tiene que ∃ x, ¬ P x
   exact hP
 
 example (P : Nat → Prop) (h : ∃ x, ¬ P x) : ¬ (∀ x, P x) := by
   Como ∃ x, ¬ P x concluimos que ¬ (∀ x, P x)
 
 example (P : Nat → Prop) (h : ∃ x, ¬ P x) : True := by
-  Como ∃ x, ¬ P x se tiene ¬ (∀ x, P x)
+  Como ∃ x, ¬ P x se tiene que ¬ (∀ x, P x)
   trivial
 
 example (h : (2 : ℝ) * -42 = 2 * 42) : False := by
@@ -353,7 +353,7 @@ example (h : (2 : ℝ) * -42 = 2 * 42) : False := by
 -- The next three examples test reelaborating numbers as reals after failure
 
 example (P : ℝ → Prop) (h : ∀ ε > 0, P ε) : P 1 := by
-  Como ∀ ε > 0, P ε ,y 1 > 0 se tiene P 1
+  Como ∀ ε > 0, P ε ,y 1 > 0 se tiene que P 1
   exact hP
 
 example (P : ℝ → Prop) (h : ∀ ε > 0, P ε) : P 1 := by
@@ -364,7 +364,7 @@ example (P : ℝ → Prop) (h : ∀ ε > 0, P ε) : P 1 := by
   norm_num
 
 example (l : ℝ) (N : ℕ) (h : |(-1)^(2*N) - l| ≤ 1/2) : True := by
-  Como |(-1)^(2*N) - l| ≤ 1/2 ,y (-1)^(2*N) = (1 : ℝ) se tiene |1 - l| ≤ 1/2
+  Como |(-1)^(2*N) - l| ≤ 1/2 ,y (-1)^(2*N) = (1 : ℝ) se tiene que |1 - l| ≤ 1/2
   trivial
 
 noncomputable section
@@ -385,7 +385,7 @@ end
 addAnonymousFactSplittingLemma lt_of_lt_of_le
 
 example (ε : ℝ) (ε_pos : 1/ε > 0) (N : ℕ) (hN : N ≥ 1 / ε) : True := by
-  Como N ≥ 1/ε ,y 1/ε > 0 se tiene N > 0
+  Como N ≥ 1/ε ,y 1/ε > 0 se tiene que N > 0
   trivial
 
 example (ε : ℝ) (ε_pos : 1/ε > 0) (N : ℕ) (hN : N ≥ 1 / ε) : N > 0 := by
@@ -393,8 +393,8 @@ example (ε : ℝ) (ε_pos : 1/ε > 0) (N : ℕ) (hN : N ≥ 1 / ε) : N > 0 := 
 
 addAnonymousFactSplittingLemma abs_of_pos
 example (a b : ℝ) (h : a ≥ b) (h' : b > 0) : True := by
-  Como a ≥ b ,y b > 0 se tiene a > 0 luego |a| = a
+  Como a ≥ b ,y b > 0 se tiene que a > 0 luego |a| = a
   trivial
 
 example (a b : ℝ) (h : a ≥ b) (h' : b > 0) : |a| = a := by
-  Como a ≥ b ,y b > 0 se tiene a > 0 finalmente concluimos que |a| = a
+  Como a ≥ b ,y b > 0 se tiene que a > 0 finalmente concluimos que |a| = a

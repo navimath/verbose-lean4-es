@@ -81,7 +81,7 @@ implement_endpoint (lang := es) helpSinceConjunctionSuggestion (hyp : Name) (p�
   let headDescr := "... y ..."
   describeHypShape hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $p₁S:term ∧ $p₂S se tiene $p₁S:term ,y $p₂S)
+  pushTac `(tactic|Como $p₁S:term ∧ $p₂S se tiene que $p₁S:term ,y $p₂S)
 
 implement_endpoint (lang := es) helpDisjunctionSuggestion (hyp : Name) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} tiene forma de « ... o ... »"
@@ -91,7 +91,7 @@ implement_endpoint (lang := es) helpDisjunctionSuggestion (hyp : Name) : Suggest
 implement_endpoint (lang := es) helpSinceDisjunctionSuggestion (hyp : Name) (p₁S p₂S : Term) : SuggestionM Unit := do
   describeHypShape hyp "... o ..."
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Decidimos en función de si $p₁S:term o $p₂S)
+  pushTac `(tactic|Distinguimos en casos según si $p₁S:term o $p₂S)
 
 implement_endpoint (lang := es) helpImplicationSuggestion (hyp HN H'N : Name) (closes : Bool)
     (le re : Expr) : SuggestionM Unit := do
@@ -238,7 +238,7 @@ implement_endpoint (lang := es) helpSinceMemUnionSuggestion (elemS leS reS : Ter
     SuggestionM Unit := do
   pushCom "La hipótesis {hyp} afirma pertenencia a una unión"
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Decidimos en función de si $elemS ∈ $leS o $elemS ∈ $reS)
+  pushTac `(tactic|Distinguimos en casos según si $elemS ∈ $leS o $elemS ∈ $reS)
 
 implement_endpoint (lang := es) helpGenericMemSuggestion (hyp : Name) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es una relación de pertenencia."
@@ -297,7 +297,7 @@ implement_endpoint (lang := es) helpSinceForAllRelExistsRelSuggestion (stmt :
     SuggestionM Unit := do
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $stmt:term ,y $stmtn₀ se tiene $var_name'.ident:ident tal que $ineqS ,y $p'S)
+  pushTac `(tactic|Como $stmt:term ,y $stmtn₀ obtenemos $var_name'.ident:ident tal que $ineqS ,y $p'S)
   pushCom "donde {n₀} es {describe t} y la relación {stmtn₀Str} se sigue inmediatamente por alguna hipótesis."
   pushComment <| libre var_name'.ident
 
@@ -348,7 +348,7 @@ implement_endpoint (lang := es) helpSinceForAllSimpleExistsRelSuggestion (stmt :
     SuggestionM Unit := do
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $stmt:term se tiene $var_name'.ident:ident tal que $ineqS ,y $p'S)
+  pushTac `(tactic|Como $stmt:term obtenemos $var_name'.ident:ident tal que $ineqS ,y $p'S)
   pushCom "donde {nn₀} es {describe t}"
   pushComment <| libre var_name'.ident
 
@@ -364,7 +364,7 @@ implement_endpoint (lang := es) helpSinceForAllSimpleExistsSimpleSuggestion (stm
     (headDescr : String) (t : Format) (p'S : Term) : SuggestionM Unit := do
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $stmt:term se tiene $var_name'.ident:ident tal que $p'S)
+  pushTac `(tactic|Como $stmt:term obtenemos $var_name'.ident:ident tal que $p'S)
   pushCom "donde {nn₀} es {describe t}"
   pushComment <| libre var_name'.ident
 
@@ -469,14 +469,14 @@ implement_endpoint (lang := es) helpExistsRelGoalSuggestion (headDescr : String)
     (fullTgtS : Term) : SuggestionM Unit := do
   descrGoalHead headDescr
   descrDirectProof
-  pushTac `(tactic|Probemos que $n₀.ident basta : $fullTgtS)
+  pushTac `(tactic|Probemos que se cumple para $n₀.ident : $fullTgtS)
   pushCom "reemplazando {n₀} por {describe t}"
 
 implement_endpoint (lang := es) helpExistsGoalSuggestion (headDescr : String) (nn₀ : Name) (t : Format)
     (tgt : Term) : SuggestionM Unit := do
   descrGoalHead headDescr
   descrDirectProof
-  pushTac `(tactic|Probemos que $nn₀.ident basta : $tgt)
+  pushTac `(tactic|Probemos que se cumple para $nn₀.ident : $tgt)
   pushCom "replacing {nn₀} by {describe t}"
 
 implement_endpoint (lang := es) helpConjunctionGoalSuggestion (p p' : Term) : SuggestionM Unit := do
@@ -527,7 +527,7 @@ implement_endpoint (lang := es) helpSetEqSuggestion (lS rS : Term) : SuggestionM
   pushTac `(tactic|Reescribimos usando ?_)
   flush
   pushCom "o mediante cálculos usando"
-  pushTac `(tactic|Calc $lS:term = $rS since?)
+  pushTac `(tactic|Por desarrollo $lS:term = $rS since?)
   flush
   pushCom "también puede demostrarse por doble inclusión."
   pushCom "En tal caso, la prueba empezaría por:"
@@ -539,7 +539,7 @@ implement_endpoint (lang := es) helpSinceSetEqSuggestion (lS rS : Term) : Sugges
   pushTac `(tactic|Como ?_ basta probar que ?_)
   flush
   pushCom "o mediante cálculos usando"
-  pushTac `(tactic|Calc $lS:term = $rS since?)
+  pushTac `(tactic|Por desarrollo $lS:term = $rS since?)
   flush
   pushCom "también puede demostrarse por doble inclusión."
   pushCom "En tal caso, la prueba empezaría por:"
@@ -551,7 +551,7 @@ implement_endpoint (lang := es) helpEqGoalSuggestion (lS rS : Term) : Suggestion
   pushTac `(tactic|Reescribimos usando ?_)
   flush
   pushCom "o mediante cálculos usando"
-  pushTac `(tactic|Calc $lS:term = $rS since?)
+  pushTac `(tactic|Por desarrollo $lS:term = $rS since?)
   flush
   pushCom "también puedes aplicar una combinación lineal de tus hipótesis con"
   pushTac `(tactic|Combinemos [?_, ?_])
@@ -562,12 +562,12 @@ implement_endpoint (lang := es) helpSinceEqGoalSuggestion (goal : Term) : Sugges
   pushTac `(tactic|Como ?_ concluimos que  $goal)
   flush
   pushCom "o start a computation usando"
-  pushTac `(tactic|Calc $goal:term since?)
+  pushTac `(tactic|Por desarrollo $goal:term since?)
 
 implement_endpoint (lang := es) helpIneqGoalSuggestion (goal : Term) (rel : String) : SuggestionM Unit := do
   pushCom "El objetivo es una desigualdad"
   pushCom "Puede calcularse usando"
-  pushTac `(tactic|Calc $goal:term since?)
+  pushTac `(tactic|Por desarrollo $goal:term since?)
   pushCom "El último cálculo no es necesariamente una igualdad, sino una desigualdad."
   pushCom "De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación "
   pushCom "deben componerse para obtener {rel}"
@@ -578,7 +578,7 @@ implement_endpoint (lang := es) helpIneqGoalSuggestion (goal : Term) (rel : Stri
 implement_endpoint (lang := es) helpSinceIneqGoalSuggestion (goal : Term) (rel : String) : SuggestionM Unit := do
   pushCom "El objetivo es una desigualdad"
   pushCom "Puede calcularse usando"
-  pushTac `(tactic|Calc $goal:term since?)
+  pushTac `(tactic|Por desarrollo $goal:term since?)
   pushCom "El último cálculo no es necesariamente una igualdad, sino una desigualdad."
   pushCom "De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación "
   pushCom "deben componerse para obtener {rel}"
@@ -1562,7 +1562,7 @@ example (P : ℕ → ℕ → Prop) (h : ∀ k, ∃ n : ℕ, P n k) : True := by
 info: Ayuda
   • La hipótesis h tiene forma de “... o ...”
     Se puede usar con:
-    Decidimos en función de si P 1 o Q 2
+    Distinguimos en casos según si P 1 o Q 2
 -/
 -- #guard_msgs in
 example (P Q : ℕ → Prop) (h : P 1 ∨ Q 2) : True := by
@@ -1612,7 +1612,7 @@ open Verbose.Named in
 info: Ayuda
   • La hipótesis h pertenece a una unión
     Se puede usar con:
-    Decidimos en función de si x ∈ s o x ∈ t
+    Distinguimos en casos según si x ∈ s o x ∈ t
 ---
 info: Ayuda
   • El objetivo es demostrar que x pertenece a la unión de t y s.
@@ -1649,7 +1649,7 @@ example (ε : ℝ) (h : ε > 0) : ε/2 > 0 := by
 info: Ayuda
   • El objetivo es una desigualdad
     Puede calcularse usando
-    Calc
+    Por desarrollo
         ε / 2 > 0 since?
     El último cálculo no es necesariamente una igualdad, sino una desigualdad.
     De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación
@@ -1723,7 +1723,7 @@ example (h : 0 = 1) : False := by
 info: Ayuda
   • El objetivo es una desigualdad
     Puede calcularse usando
-    Calc
+    Por desarrollo
         a ≤ c since?
     El último cálculo no es necesariamente una igualdad, sino una desigualdad.
     De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación

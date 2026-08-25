@@ -16,7 +16,7 @@ implement_endpoint (lang := es) createTwoStepsMsg : MetaM String := pure "Crea d
 @[server_rpc_method]
 def VerboseCalcPanelES.rpc := mkSelectionPanelRPC' verboseSuggestSteps
   "Selecciona una sub-expresión de la meta haciendo shift-click."
-  "Creación de un nuevo paso de calculo"
+  "Creación de un nuevo paso de desarrollo"
   (extraCss := some "#suggestions {display:none}")
 
 /-- The calc widget. -/
@@ -24,8 +24,8 @@ def VerboseCalcPanelES.rpc := mkSelectionPanelRPC' verboseSuggestSteps
 def WidgetCalcPanelES : Component CalcParams :=
   mk_rpc_widget% VerboseCalcPanelES.rpc
 
-implement_endpoint (lang := es) mkComputeCalcTac : MetaM String := pure "por cálculo"
-implement_endpoint (lang := es) mkComputeCalcDescr : MetaM String := pure "Verificar por cálculo"
+implement_endpoint (lang := es) mkComputeCalcTac : MetaM String := pure "por cuentas"
+implement_endpoint (lang := es) mkComputeCalcDescr : MetaM String := pure "Verificar por cuentas"
 implement_endpoint (lang := es) mkComputeAssptTac : MetaM String := pure "por hipótesis"
 implement_endpoint (lang := es) mkComputeAssptDescr : MetaM String := pure "Verificar por hipótesis"
 implement_endpoint (lang := es) mkSinceCalcTac : MetaM String := pure "Como"
@@ -77,7 +77,7 @@ open Meta Verbose Spanish
 declare_syntax_cat CalcFirstStepES
 syntax ppIndent(colGe term (" por "  sepBy1(maybeAppliedES, ",", AndES))?) : CalcFirstStepES
 /- syntax ppIndent(colGe term (" por hipótesis")?) : CalcFirstStepES -/
-syntax ppIndent(colGe term (" por cálculo")?) : CalcFirstStepES
+syntax ppIndent(colGe term (" por cuentas")?) : CalcFirstStepES
 syntax ppIndent(colGe term (" ya que " factsES)?) : CalcFirstStepES
 syntax ppIndent(colGe term (" usando?")?) : CalcFirstStepES
 syntax ppIndent(colGe term (" usando " tacticSeq)?) : CalcFirstStepES
@@ -86,14 +86,14 @@ syntax ppIndent(colGe term (" usando " tacticSeq)?) : CalcFirstStepES
 declare_syntax_cat CalcStepES
 syntax ppIndent(colGe term " por " sepBy1(maybeAppliedES, ",", AndES)) : CalcStepES
 /- syntax ppIndent(colGe term " por hipótesis") : CalcStepES -/
-syntax ppIndent(colGe term " por cálculo") : CalcStepES
+syntax ppIndent(colGe term " por cuentas") : CalcStepES
 syntax ppIndent(colGe term " ya que " factsES) : CalcStepES
 syntax ppIndent(colGe term " usando?") : CalcStepES
 syntax ppIndent(colGe term " usando " tacticSeq) : CalcStepES
 
 syntax calcStepsES := ppLine withPosition(CalcFirstStepES) withPosition((ppLine linebreak CalcStepES)*)
 
-syntax (name := calcTacticES) "Calc" calcStepsES : tactic
+syntax (name := calcTacticES) "Por desarrollo" calcStepsES : tactic
 
 elab tk:"comoCalcTac" factsES:factsES : tactic => withRef tk <| sinceCalcTac (factsESToArray factsES)
 
@@ -102,7 +102,7 @@ def convertFirstCalcStepES (step : TSyntax `CalcFirstStepES) : TermElabM (TSynta
   | `(CalcFirstStepES|$t:term) => pure (← `(calcFirstStep|$t:term), none)
 /-   | `(CalcFirstStepES|$t:term por%$btk hipótesis%$ctk) =>
     pure (← run t btk ctk `(tacticSeq| asunción), none) -/
-  | `(CalcFirstStepES|$t:term por%$btk cálculo%$ctk) =>
+  | `(CalcFirstStepES|$t:term por%$btk cuentas%$ctk) =>
     pure (← run t btk ctk `(tacticSeq| computeCalcTac), none)
 /-   | `(CalcFirstStepES|$t:term por%$tk $prfs:term) => do
     let prfT ← liftMetaM <| pure prfs
@@ -131,7 +131,7 @@ def convertCalcStepES (step : TSyntax `CalcStepES) : TermElabM (TSyntax ``calcSt
   match step with
 /-   | `(CalcStepES|$t:term por%$btk hipótesis%$ctk) =>
     pure (← run t btk ctk `(tacticSeq| asunción), none) -/
-  | `(CalcStepES|$t:term por%$btk cálculo%$ctk) =>
+  | `(CalcStepES|$t:term por%$btk cuentas%$ctk) =>
     pure (← run t btk ctk `(tacticSeq| computeCalcTac), none)
 /-   | `(CalcFirstStepES|$t:term por%$tk $prfs:term) => do
     let prfT ← liftMetaM <| pure prfs
@@ -172,7 +172,7 @@ def convertCalcStepsES (steps : TSyntax ``calcStepsES) : TermElabM (TSyntax ``ca
   | _ => throwUnsupportedSyntax
 
 elab_rules : tactic
-| `(tactic|Calc%$calcstx $stx) => do
+| `(tactic|Por desarrollo%$calcstx $stx) => do
   let steps : TSyntax ``calcStepsES := ⟨stx⟩
   let (steps, tks?) ← convertCalcStepsES steps
   let views ← Lean.Elab.Term.mkCalcStepViews steps
@@ -195,45 +195,45 @@ elab_rules : tactic
       isFirst := false
   evalVerboseCalc (← `(tactic|calc%$calcstx $steps))
 
-syntax (name := Calc?ES) "Calc?" : tactic
+syntax (name := Calc?ES) "Por desarrollo?" : tactic
 
-elab "Calc?" : tactic =>
-  mkCalc?Tac "Creación del cálculo" "Calc" "usando?"
+elab "Por desarrollo?" : tactic =>
+  mkCalc?Tac "Creación del desarrollo" "Por desarrollo" "usando?"
 
 setLang es
 
 example (a b : ℕ) : (a + b)^ 2 = 2*a*b + (a^2 + b^2) := by
   success_if_fail_with_msg "Unknown identifier `x`"
-    Calc (x+b)^2 = a^2 + b^2 + 2*a*b por cálculo
-    _ = 2*a*b + (a^2 + b^2) por cálculo
-  Calc (a+b)^2 = a^2 + b^2 + 2*a*b   por cálculo
-    _           = 2*a*b + (a^2 + b^2) por cálculo
+    Por desarrollo (x+b)^2 = a^2 + b^2 + 2*a*b por cuentas
+              _ = 2*a*b + (a^2 + b^2) por cuentas
+  Por desarrollo (a+b)^2 = a^2 + b^2 + 2*a*b   por cuentas
+              _           = 2*a*b + (a^2 + b^2) por cuentas
 
 example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
-  Calc a + c    ≤ b + c  por h
-  _              ≤ b + d por h'
+  Por desarrollo a + c    ≤ b + c  por h
+            _              ≤ b + d por h'
 
 example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
-  Calc a + 0 + c = a + c por cálculo
-  _              ≤ b + c por h
-  _              ≤ b + d por h'
+  Por desarrollo a + 0 + c = a + c por cuentas
+            _              ≤ b + c por h
+            _              ≤ b + d por h'
 
 example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
-  Calc a + 0 + c = a + c por cálculo
-  _              ≤ b + c ya que a ≤ b
-  _              ≤ b + d ya que c ≤ d
+  Por desarrollo a + 0 + c = a + c por cuentas
+            _              ≤ b + c ya que a ≤ b
+            _              ≤ b + d ya que c ≤ d
 
 example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
-  Calc a + 0 + c = a + c por cálculo
-  _              ≤ b + d ya que a ≤ b ,y c ≤ d
+  Por desarrollo a + 0 + c = a + c por cuentas
+            _              ≤ b + d ya que a ≤ b ,y c ≤ d
 
 example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
-  Calc a + 0 + c = a + c por cálculo
-  _              ≤ b + d por h ,y h'
+  Por desarrollo a + 0 + c = a + c por cuentas
+            _              ≤ b + d por h ,y h'
 
 example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
-  Calc a + 0 + c = a + c por cálculo
-  _              ≤ b + d por h ,e h'
+  Por desarrollo a + 0 + c = a + c por cuentas
+            _              ≤ b + d por h ,e h'
 
 def even_fun  (f : ℝ → ℝ) := ∀ x, f (-x) = f x
 
@@ -241,62 +241,62 @@ example (f g : ℝ → ℝ) : even_fun f → even_fun g →  even_fun (f + g) :=
   intro hf hg
   show ∀ x, (f+g) (-x) = (f+g) x
   intro x₀
-  Calc (f + g) (-x₀) = f (-x₀) + g (-x₀) por cálculo
-  _                  = f x₀ + g (-x₀)    ya que f (-x₀) = f x₀
-  _                  = f x₀ + g x₀       ya que g (-x₀) = g x₀
-  _                  = (f + g) x₀        por cálculo
+  Por desarrollo (f + g) (-x₀) = f (-x₀) + g (-x₀) por cuentas
+            _                  = f x₀ + g (-x₀)    ya que f (-x₀) = f x₀
+            _                  = f x₀ + g x₀       ya que g (-x₀) = g x₀
+            _                  = (f + g) x₀        por cuentas
 
 example (f g : ℝ → ℝ) : even_fun f →  even_fun (g ∘ f) := by
   intro hf x
-  Calc (g ∘ f) (-x) = g (f (-x)) por cálculo
-                _   = g (f x)    ya que f (-x) = f x
+  Por desarrollo (g ∘ f) (-x) = g (f (-x)) por cuentas
+                          _   = g (f x)    ya que f (-x) = f x
 
 example (f : ℝ → ℝ) (x : ℝ) (hx : f (-x) = f x ∧ 1 = 1) : f (-x) + 0 = f x := by
-  Calc f (-x) + 0 = f (-x) por cálculo
-                _   = f x  ya que f (-x) = f x
+  Por desarrollo f (-x) + 0 = f (-x) por cuentas
+                          _   = f x  ya que f (-x) = f x
 
 example (f g : ℝ → ℝ) (hf : even_fun f) (hg : even_fun g) (x) :  (f+g) (-x) = (f+g) x := by
-  Calc (f + g) (-x) = f (-x) + g (-x) por cálculo
-  _                 = f x + g (-x)    ya que even_fun f
-  _                 = f x + g x       ya que even_fun g
-  _                 = (f + g) x       por cálculo
+  Por desarrollo (f + g) (-x) = f (-x) + g (-x) por cuentas
+            _                 = f x + g (-x)    ya que even_fun f
+            _                 = f x + g x       ya que even_fun g
+            _                 = (f + g) x       por cuentas
 
 example (ε : ℝ) (h : ε > 1) : 0 ≤ ε := by
-  Calc
+  Por desarrollo
     (0 : ℝ) ≤ 1 por norm_num
     _       < ε por h
 
 example (ε : ℝ) (h : ε > 1) : ε ≥ 0 := by
-  Calc
+  Por desarrollo
     (0 : ℝ) ≤ 1 por norm_num
     _       < ε por h
 
 example (ε : ℝ) (h : ε > 1) : ε ≥ 0 := by
-  Calc
+  Por desarrollo
     ε > 1 por h
     _ > 0 por norm_num
 
 example (ε : ℝ) (h : ε = 1) : ε+1 ≥ 2 := by
-  Calc
+  Por desarrollo
     ε + 1 = 1 + 1 usando rw[h]
     _     = 2 por norm_num
 
 example (ε : ℝ) (h : ε = 1) : ε+1 ≤ 2 := by
-  Calc
+  Por desarrollo
     ε + 1 = 1 + 1 usando rw [h]
     _     = 2 por norm_num
 
 example (f : ℝ → ℝ) (h : ∀ x, f (f x) = x) : f (f 0) + 0 = 0 := by
-  Calc
-    f (f 0) + 0 = f (f 0) por cálculo
+  Por desarrollo
+    f (f 0) + 0 = f (f 0) por cuentas
     _           = 0      por hipótesis
 
 /- example (f : ℝ → ℝ) (h : ∀ x, f (f x) = x) : f (f 0) = 0 + 0 := by
-  Calc
+  Por desarrollo
     f (f 0) = 0 por hipótesis -/
 
 example (u : ℕ → ℝ) (y) (hy : ∀ n, u n = y) (n m) : u n = u m := by
-  Calc
+  Por desarrollo
     u n = y ya que ∀ n, u n = y
     _   = u m ya que ∀ n, u n = y
 
@@ -307,10 +307,10 @@ example (ε : ℝ) (ε_pos : 1/ε > 0) (N : ℕ) (hN : N ≥ 1 / ε) : N > 0 := 
   3 > 0
 but is expected to have type
   N > 0"
-    Calc
+    Por desarrollo
       3 ≥ 1/ε usando?
       _ > 0 por ε_pos
-  Calc
+  Por desarrollo
     N ≥ 1/ε por hN
     _ > 0 por ε_pos
 
@@ -320,28 +320,28 @@ example (ε : ℝ) (ε_pos : 1/ε > 0) (N : ℕ) (hN : N ≥ 1 / ε) : N ≥ 0 :
   3 > 0
 but is expected to have type
   N ≥ 0"
-    Calc
+    Por desarrollo
       3 ≥ 1/ε usando?
       _ > 0 por ε_pos
-  Calc
+  Por desarrollo
     N ≥ 1/ε por hN
     _ > 0 por ε_pos
 
 -- A case where the conclusion has an extra cast
 example (N : ℕ) (hN : N ≥ 3) : N > (1 : ℝ) := by
-  Calc
+  Por desarrollo
     N ≥ 3 por hN
-    _ > 1 por cálculo
+    _ > 1 por cuentas
 
 -- Combine with relaxed calc now
 example (N : ℕ) (hN : N ≥ 3) : N ≥ (1 : ℝ) := by
-  Calc
+  Por desarrollo
     N ≥ 3 por hN
-    _ > 1 por cálculo
+    _ > 1 por cuentas
 
 example (x : ℝ) (p : ℕ) (h : x ≤ p) : x < (p + 1 : ℕ) := by
-  Calc x ≤ p por hipótesis
-    _ < p + 1 por cálculo
+  Por desarrollo x ≤ p por hipótesis
+              _ < p + 1 por cuentas
 
 example (u : Nat → Nat) (h : ∀ n, u n = u 0)
   : ∀ n, ∀ m, u m = u n := by
@@ -350,16 +350,16 @@ example (u : Nat → Nat) (h : ∀ n, u n = u 0)
   u m : Nat
 but is expected to be
   u n : Nat"
-    Calc
+    Por desarrollo
       u m = u 0 ya que ∀ n, u n = u 0
       _   = u n ya que ∀ n, u n = u 0
   success_if_fail_with_msg "invalid 'calc' step, right-hand side is
   u n : Nat
 but is expected to be
   u m : Nat"
-    Calc
+    Por desarrollo
       u n = u 0 ya que ∀ n, u n = u 0
       _   = u n ya que ∀ n, u n = u 0
-  Calc
+  Por desarrollo
     u n = u 0 ya que ∀ n, u n = u 0
     _   = u m ya que ∀ n, u n = u 0
