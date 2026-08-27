@@ -134,7 +134,7 @@ implement_endpoint (lang := es) helpEquivalenceSuggestion (hyp hyp'N : Name) (l 
   pushCom "Se puede reemplazar el lado derecho del objetivo con:"
   pushTac `(tactic|Reescribimos usando ← $hyp.ident)
   flush
-  pushCom "También se puede aplicar la misma sustitución en {hyp'N} con"
+  pushCom "También se puede aplicar la misma sustitución en {hyp'N} con:"
   pushTac `(tactic|Reescribimos usando $hyp.ident:term en la hipótesis $hyp'N.ident:ident)
   flush
   pushCom "o"
@@ -373,7 +373,7 @@ implement_endpoint (lang := es) helpForAllSimpleForAllRelSuggestion (hyp nn₀ v
   pushCom "La hipótesis {hyp} empieza con “{headDescr}"
   pushCom "Se puede usar con:"
   pushTac `(tactic|Por $hyp.ident:term aplicado a $nn₀.ident ,y $var_name'₀.ident usando $H.ident tenemos ($h.ident : $p'S))
-  pushCom "donde {nn₀} y {var_name'₀} forman {describe_pl t} y {H} una demostración de {rel₀}"
+  pushCom "donde {nn₀} y {var_name'₀} son {describe_pl t} y {H} una demostración de {rel₀}"
   pushComment <| libre h.ident
 
 implement_endpoint (lang := es) helpSinceForAllSimpleForAllRelSuggestion (stmt rel₀S : Term) (hyp nn₀ var_name'₀ : Name)
@@ -381,7 +381,7 @@ implement_endpoint (lang := es) helpSinceForAllSimpleForAllRelSuggestion (stmt r
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
   pushTac `(tactic|Como $stmt:term ,y $rel₀S:term tenemos que $p'S:term)
-  pushCom "donde {nn₀} y {var_name'₀} forman {describe_pl t} y {rel₀} que se sigue inmediatamente por alguna hipótesis."
+  pushCom "donde {nn₀} y {var_name'₀} son {describe_pl t} y {rel₀} se sigue inmediatamente por alguna hipótesis."
 
 implement_endpoint (lang := es) helpForAllSimpleGenericSuggestion (hyp nn₀ hn₀ : Name) (headDescr : String)
     (t : Format) (pS : Term) : SuggestionM Unit := do
@@ -391,7 +391,7 @@ implement_endpoint (lang := es) helpForAllSimpleGenericSuggestion (hyp nn₀ hn�
   pushCom "donde {nn₀} es {describe t}"
   pushComment <| libre hn₀.ident
   flush
-  pushCom "Si esta hipótesis no se va a volver a utilizar en su forma general, también se puede especializar {hyp} con"
+  pushCom "Si esta hipótesis no se va a volver a utilizar en su forma general, también se puede especializar {hyp} con:"
   pushTac `(tactic|Usamos $hyp.ident:ident en $nn₀.ident)
 
 implement_endpoint (lang := es) helpSinceForAllSimpleGenericSuggestion (stmt : Term) (hyp nn₀ : Name) (headDescr : String)
@@ -401,7 +401,7 @@ implement_endpoint (lang := es) helpSinceForAllSimpleGenericSuggestion (stmt : T
   pushTac `(tactic|Como $stmt:term tenemos que $pS:term)
   pushCom "donde {nn₀} es {describe t}"
   flush
-  pushCom "Si esta hipótesis no se va a volver a utilizar en su forma general, también se puede especializar {hyp} con"
+  pushCom "Si esta hipótesis no se va a volver a utilizar en su forma general, también se puede especializar {hyp} con:"
   pushTac `(tactic|Usamos $hyp.ident:ident en $nn₀.ident)
 
 implement_endpoint (lang := es) helpForAllSimpleGenericApplySuggestion (prf : Expr) (but : Format) :
@@ -428,8 +428,8 @@ implement_endpoint (lang := es) helpDataSuggestion (hyp : Name) (t : Format) : S
   pushComment <| s!"El objeto {hyp}" ++ match t with
     | "ℝ" => " es un número real fijo."
     | "ℕ" => " es un número natural fijo."
-    | "ℤ" => " es un número entero fijo"
-    | s => s!" : {s} está fijado."
+    | "ℤ" => " es un número entero fijo."
+    | s => s!" : {s} está fijo."
 
 implement_endpoint (lang := es) helpNothingSuggestion : SuggestionM Unit := do
   pushCom "No tengo nada que decir de esta hipótesis."
@@ -443,7 +443,7 @@ def descrGoalHead (headDescr : String) : SuggestionM Unit :=
  pushCom "El objetivo empieza con “{headDescr}”"
 
 def descrGoalShape (headDescr : String) : SuggestionM Unit :=
- pushCom "El objetivo tiene la forma de “{headDescr}”"
+ pushCom "El objetivo tiene la forma “{headDescr}”"
 
 def descrDirectProof : SuggestionM Unit :=
  pushCom "Luego una demostración directa puede empezar con: "
@@ -456,7 +456,7 @@ implement_endpoint (lang := es) helpUnfoldableGoalSuggestion (expandedGoalTypeS 
   flush
 
 implement_endpoint (lang := es) helpAnnounceGoalSuggestion (actualGoalS : Term) : SuggestionM Unit := do
-  pushCom "El siguiente paso es anunciarlo:"
+  pushCom "El siguiente paso es anunciar:"
   pushTac `(tactic| Probemos ahora que $actualGoalS)
 
 implement_endpoint (lang := es) helpFixSuggestion (headDescr : String) (ineqS : TSyntax `fixDecl) :
@@ -523,73 +523,73 @@ implement_endpoint (lang := es) helpEquivalenceGoalSuggestion (mpF mrF : Format)
 
 implement_endpoint (lang := es) helpSetEqSuggestion (lS rS : Term) : SuggestionM Unit := do
   pushCom "El objetivo es una igualdad entre conjuntos"
-  pushCom "Se puede reescribirla usando:"
+  pushCom "Se puede reescribir usando:"
   pushTac `(tactic|Reescribimos usando ?_)
   flush
   pushCom "o mediante cálculos usando"
   pushTac `(tactic|Por desarrollo $lS:term = $rS since?)
   flush
-  pushCom "también puede demostrarse por doble inclusión."
+  pushCom "También puede demostrarse por doble inclusión."
   pushCom "En tal caso, la prueba empezaría por:"
   pushTac `(tactic|Primero probemos que $lS ⊆ $rS)
 
 implement_endpoint (lang := es) helpSinceSetEqSuggestion (lS rS : Term) : SuggestionM Unit := do
   pushCom "El objetivo es una igualdad entre conjuntos"
-  pushCom "Se puede reescribirla usando:"
+  pushCom "Se puede reescribir usando:"
   pushTac `(tactic|Como ?_ basta probar que ?_)
   flush
   pushCom "o mediante cálculos usando"
   pushTac `(tactic|Por desarrollo $lS:term = $rS since?)
   flush
-  pushCom "también puede demostrarse por doble inclusión."
+  pushCom "También puede demostrarse por doble inclusión."
   pushCom "En tal caso, la prueba empezaría por:"
   pushTac `(tactic|Primero probemos que $lS ⊆ $rS)
 
 implement_endpoint (lang := es) helpEqGoalSuggestion (lS rS : Term) : SuggestionM Unit := do
   pushCom "El objetivo es una igualdad"
-  pushCom "Se puede reescribirla usando:"
+  pushCom "Se puede reescribir usando:"
   pushTac `(tactic|Reescribimos usando ?_)
   flush
   pushCom "o mediante cálculos usando"
   pushTac `(tactic|Por desarrollo $lS:term = $rS since?)
   flush
-  pushCom "también puedes aplicar una combinación lineal de tus hipótesis con"
+  pushCom "También puedes aplicar una combinación lineal de tus hipótesis con:"
   pushTac `(tactic|Combinemos [?_, ?_])
 
 implement_endpoint (lang := es) helpSinceEqGoalSuggestion (goal : Term) : SuggestionM Unit := do
   pushCom "El objetivo es una igualdad"
-  pushCom "Se puede reescribirla usando:"
+  pushCom "Se puede reescribir usando:"
   pushTac `(tactic|Como ?_ concluimos que  $goal)
   flush
-  pushCom "o start a computation usando"
+  pushCom "o mediante cálculos usando"
   pushTac `(tactic|Por desarrollo $goal:term since?)
 
 implement_endpoint (lang := es) helpIneqGoalSuggestion (goal : Term) (rel : String) : SuggestionM Unit := do
   pushCom "El objetivo es una desigualdad"
-  pushCom "Puede calcularse usando"
+  pushCom "Se puede probar mediante cálculos usando"
   pushTac `(tactic|Por desarrollo $goal:term since?)
-  pushCom "El último cálculo no es necesariamente una igualdad, sino una desigualdad."
+  pushCom "El último cálculo no es necesariamente una igualdad, puede ser una desigualdad."
   pushCom "De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación "
   pushCom "deben componerse para obtener {rel}"
   flush
-  pushCom "también puedes aplicar una combinación lineal de tus hipótesis con"
+  pushCom "También puedes aplicar una combinación lineal de tus hipótesis con:"
   pushTac `(tactic| Combinemos [?_, ?_])
 
 implement_endpoint (lang := es) helpSinceIneqGoalSuggestion (goal : Term) (rel : String) : SuggestionM Unit := do
   pushCom "El objetivo es una desigualdad"
-  pushCom "Puede calcularse usando"
+  pushCom "Se puede probar mediante cálculos usando"
   pushTac `(tactic|Por desarrollo $goal:term since?)
-  pushCom "El último cálculo no es necesariamente una igualdad, sino una desigualdad."
+  pushCom "El último cálculo no es necesariamente una igualdad, puede ser una desigualdad."
   pushCom "De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación "
   pushCom "deben componerse para obtener {rel}"
   flush
   pushCom "Si esta desigualdad se sigue directamente de una hipótesis, se puede usar:"
   pushTac `(tactic|Como ?_ concluimos que  $goal)
-  pushCom "sustituyendo el signo de interrogación por la formulación de la hipótesis."
+  pushCom "sustituyendo el signo de interrogación por el enunciado de la hipótesis."
 
 implement_endpoint (lang := es) helpMemInterGoalSuggestion (elem le : Expr) : SuggestionM Unit := do
   pushCom "El objetivo es demostrar que {← elem.fmt} pertenece a la intersección de {← le.fmt} con otro conjunto."
-  pushCom "Luego una demostración empezaría con: "
+  pushCom "Luego una demostración directa empezaría con: "
   pushTac `(tactic|Primero probemos que $(← elem.stx) ∈ $(← le.stx))
 
 implement_endpoint (lang := es) helpMemUnionGoalSuggestion (elem le re : Expr) : SuggestionM Unit := do
@@ -605,25 +605,25 @@ implement_endpoint (lang := es) helpNoIdeaGoalSuggestion : SuggestionM Unit := d
 
 implement_endpoint (lang := es) helpSubsetGoalSuggestion (l r : Format) (xN : Name) (lT : Term) :
     SuggestionM Unit := do
-  pushCom "El objetivo la inclusión {l} ⊆ {r}"
+  pushCom "El objetivo es la inclusión {l} ⊆ {r}"
   descrDirectProof
   pushTac `(tactic| Sea $xN.ident:ident ∈ $lT)
   pushComment <| libre xN.ident
 
 implement_endpoint (lang := es) helpFalseGoalSuggestion : SuggestionM Unit := do
-  pushCom "El objetivo es demostrar que hay una contradicción."
-  pushCom "Se puede aplicar una suposición que sea una negación"
-  pushCom "es decir, una suposición de la forma P → falso."
+  pushCom "El objetivo es demostrar que se da una contradicción."
+  pushCom "Se puede aplicar una hipótesis que sea una negación"
+  pushCom "es decir, una hipótesis de la forma P → falso."
 
 implement_endpoint (lang := es) helpSinceFalseGoalSuggestion (goal : Term) : SuggestionM Unit := do
-  pushCom "El objetivo es demostrar que hay una contradicción"
-  pushCom "Se puede aplicar una suposición que sea una negación"
-  pushCom "es decir, una suposición de la forma P → falso."
+  pushCom "El objetivo es demostrar que se da una contradicción"
+  pushCom "Se puede aplicar una hipótesis que sea una negación"
+  pushCom "es decir, una hipótesis de la forma P → falso."
   pushCom "También puedes combinar dos hipótesis que claramente se contradigan usando: "
   pushTac `(tactic|Como ?_ ,y ?_ concluimos que  $goal)
   pushCom "sustituyendo los signos de interrogación por esos dos hechos que se deducen directamente de las hipótesis."
   flush
-  pushCom "También se puede invocar un hecho claramente falso (como «0 = 1») que se deduce directamente de una suposición."
+  pushCom "También se puede invocar un hecho claramente falso (como `0 = 1`) que se deduce directamente de una hipótesis."
   pushTac `(tactic|Como ?_ concluimos que  $goal)
   pushCom "reemplazando el signo de interrogación por cualquier hecho claramente falso."
 
@@ -652,7 +652,7 @@ open Verbose.Named in
 implement_endpoint (lang := es) helpNegationGoalSuggestion (hyp : Ident) (p : Format) (assum : Term) :
     SuggestionM Unit := do
   pushCom "El objetivo es la negación de {p}, es decir, {p} implica una contradicción"
-  pushCom "Luego una prueba directa empieza con"
+  pushCom "Luego una prueba directa empieza con:"
   pushTac `(tactic| Supongamos $hyp:ident : $assum)
   pushCom "Luego solo queda demostrar la contradicción."
 
@@ -660,7 +660,7 @@ open Verbose.NameLess in
 implement_endpoint (lang := es) helpNegationNLGoalSuggestion (p : Format) (assum : Term) :
     SuggestionM Unit := do
   pushCom "El objetivo es la negación de {p}, es decir, {p} implica una contradicción"
-  pushCom "Luego una prueba directa empieza con"
+  pushCom "Luego una prueba directa empieza con:"
   pushTac `(tactic| Supongamos que $assum)
   pushCom "Luego solo queda demostrar la contradicción."
 
@@ -668,15 +668,15 @@ open Verbose.Named in
 implement_endpoint (lang := es) helpNeGoalSuggestion (l r : Format) (lS rS : Term) (Hyp : Ident):
     SuggestionM Unit := do
   pushCom "El objetivo es la negación de {l} = {r}, es decir, {l} = {r} implica una contradicción"
-  pushCom "Luego una prueba directa empieza con"
+  pushCom "Luego una prueba directa empieza con:"
   pushTac `(tactic| Supongamos $Hyp:ident : $lS = $rS)
   pushCom "Luego solo queda demostrar la contradicción."
 
 open Verbose.NameLess in
 implement_endpoint (lang := es) helpNeGoalNLSuggestion (l r : Format) (lS rS : Term) :
     SuggestionM Unit := do
-  pushCom "El objetivo es la negación  {l} = {r}, , es decir, {l} = {r} implica una contradicción"
-  pushCom "Luego una prueba directa empieza con"
+  pushCom "El objetivo es la negación de {l} = {r}, es decir, {l} = {r} implica una contradicción"
+  pushCom "Luego una prueba directa empieza con:"
   pushTac `(tactic| Supongamos que $lS = $rS)
   pushCom "Luego solo quedaría demostrar la contradicción."
 
