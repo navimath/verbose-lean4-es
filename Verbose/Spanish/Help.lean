@@ -31,7 +31,7 @@ def describe (t : Format) : String :=
 match toString t with
 | "ℝ" => "un número real"
 | "ℕ" => "un número natural"
-| "ℤ" => "un numero entero"
+| "ℤ" => "un número entero"
 | t => "una expresión de tipo " ++ t
 
 def describe_pl (t : Format) : String :=
@@ -121,7 +121,7 @@ implement_endpoint (lang := es) helpSinceImplicationSuggestion (stmt goalS leS :
     pushCom "Si ya tienes una prueba de {← le.fmt} puedes probar con:"
     pushTac `(tactic|Como $stmt:term ,y $(← le.stx):term concluimos que $goalS)
   else do
-    pushCom "La premisa de está implicación es {← le.fmt}"
+    pushCom "La premisa de esta implicación es {← le.fmt}"
     pushCom "Si tienes una prueba de {← le.fmt}"
     pushCom "Puedes usar esta hipótesis con:"
     pushTac `(tactic|Como $stmt:term ,y $leS:term tenemos que $(← re.stx):term)
@@ -143,9 +143,9 @@ implement_endpoint (lang := es) helpEquivalenceSuggestion (hyp hyp'N : Name) (l 
 implement_endpoint (lang := es) helpSinceEquivalenceSuggestion
     (hyp : Name) (stmt : Term) (l r : Expr) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es una equivalencia"
-  pushCom "Se puede reemplazar el lado izquierdo ({← l.fmt}) con el lado derecho ({← r.fmt}) en el objetivo o viceversa en el objetivo con:"
+  pushCom "Se puede reemplazar el lado izquierdo ({← l.fmt}) con el lado derecho ({← r.fmt}) o viceversa en el objetivo con:"
   pushTac `(tactic|Como $stmt:term basta probar que ?_)
-  pushCom "reemplazando el signo de interrogación por el nuevo objetivo ."
+  pushCom "reemplazando el signo de interrogación por el nuevo objetivo."
   flush
   pushCom "Estas sustituciones también se pueden aplicar en una afirmación que se derive de alguna de las hipótesis actuales con:"
   pushTac `(tactic|Como $stmt:term ,y ?_ tenemos que ?_)
@@ -206,7 +206,7 @@ implement_endpoint (lang := es) helpIneqSuggestion (hyp : Name) (closes : Bool) 
 implement_endpoint (lang := es) helpSinceIneqSuggestion (hyp : Name) (stmt goal : Term) (closes : Bool) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es una desigualdad"
   if closes then
-    pushCom "El objetivo actual se deriva inmediate de esta."
+    pushCom "El objetivo actual se deriva inmediatamente de esta."
     pushCom "Se puede usar con:"
     pushTac `(tactic|Como $stmt:term concluimos que  $goal)
   else do
@@ -451,7 +451,7 @@ def descrDirectProof : SuggestionM Unit :=
 implement_endpoint (lang := es) helpUnfoldableGoalSuggestion (expandedGoalTypeS : Term) :
     SuggestionM Unit := do
   pushCom "El objetivo empieza aplicando una definición."
-  pushCom "Se puede hacer explícita con:"
+  pushCom "Se puede hacer explícito con:"
   pushTac `(tactic|Probemos que $expandedGoalTypeS)
   flush
 
