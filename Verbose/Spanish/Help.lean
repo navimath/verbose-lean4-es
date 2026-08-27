@@ -98,21 +98,21 @@ implement_endpoint (lang := es) helpImplicationSuggestion (hyp HN H'N : Name) (c
   pushCom "La hipótesis {hyp} es una implicación"
   if closes then do
     pushCom "La conclusión de esta implicación es el objetivo actual"
-    pushCom "Hence one can use this assumption with:"
+    pushCom "Entonces se puede usar esta hipótesis con:"
     pushTac `(tactic| Por $hyp.ident:term basta probar que $(← le.stx))
     flush
-    pushCom "If one already has a proof {HN} of {← le.fmt} then one can use:"
+    pushCom "Si se tiene una demostración de {← le.fmt}, se puede usar:"
     pushTac `(tactic|Concluimos por $hyp.ident:term aplicado a $HN.ident)
   else do
-    pushCom "The premise de esta implicación is {← le.fmt}"
-    pushCom "If you have a proof {HN} of {← le.fmt}"
+    pushCom "La premisa de esta implicación es {← le.fmt}"
+    pushCom "Si se tiene una demostración {HN} of {← le.fmt}"
     pushCom "Puedes usar esta hipótesis con:"
     pushTac `(tactic|Por $hyp.ident:term aplicado a $HN.ident:term tenemos $H'N.ident:ident : $(← re.stx):term)
     pushComment <| libre H'N.ident
 
 implement_endpoint (lang := es) helpSinceImplicationSuggestion (stmt goalS leS : Term) (hyp : Name) (closes : Bool)
     (le re : Expr) : SuggestionM Unit := do
-  pushCom "Assumption {hyp} es una implicación"
+  pushCom "La hipótesis {hyp} es una implicación"
   if closes then do
     pushCom "La conclusión de esta implicación es el objetivo actual"
     pushCom "Entonces, uno puede usar esta hipótesis con:"
@@ -477,7 +477,7 @@ implement_endpoint (lang := es) helpExistsGoalSuggestion (headDescr : String) (n
   descrGoalHead headDescr
   descrDirectProof
   pushTac `(tactic|Probemos que se cumple para $nn₀.ident : $tgt)
-  pushCom "replacing {nn₀} by {describe t}"
+  pushCom "reemplazando {nn₀} por {describe t}"
 
 implement_endpoint (lang := es) helpConjunctionGoalSuggestion (p p' : Term) : SuggestionM Unit := do
   descrGoalShape "... y ..."
@@ -485,7 +485,7 @@ implement_endpoint (lang := es) helpConjunctionGoalSuggestion (p p' : Term) : Su
   pushTac `(tactic|Primero probemos que $p)
   pushCom "Una vez terminada esta primera demostración, quedará por demostrar que {← p'.fmt}"
   flush
-  pushCom "One can also start with"
+  pushCom "También se puede empezar con:"
   pushTac `(tactic|Primero probemos que $p')
   pushCom "Una vez terminada esta primera demostración, quedará por demostrar que {← p.fmt}"
 
