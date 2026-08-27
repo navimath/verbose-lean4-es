@@ -155,7 +155,7 @@ implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : 
     SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es una igualdad"
   if closes then
-    pushComment <| s!"El objetivo actual es inmediato"
+    pushComment <| s!"El objetivo actual es se deriva inmediatamente de esta."
     pushComment   "Se puede usar con:"
     pushTac `(tactic|Concluimos por $hyp.ident:ident)
   else do
@@ -171,7 +171,7 @@ implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : 
     pushCom "o"
     pushTac `(tactic|Reescribimos usando ← $hyp.ident:ident en la hipótesis $hyp'.ident:ident)
     flush
-    pushCom "Puede usarse en algún cálculo o combinación lineal con:"
+    pushCom "También puede usarse en algún paso de cálculo, o combinarse linealmente con:"
     pushTac `(tactic|Combinemos [$hyp.ident:term, ?_])
     pushCom "sustituyendo el signo de interrogación por uno o varios términos que demuestren las igualdades."
 
@@ -199,7 +199,7 @@ implement_endpoint (lang := es) helpIneqSuggestion (hyp : Name) (closes : Bool) 
     pushCom "Se puede usar con:"
     pushTac `(tactic|Concluimos por $hyp.ident:ident)
   else do
-    pushCom "Puede usarse en algún cálculo o combinación lineal con:"
+    pushCom "También puede usarse en algún paso de cálculo, o combinarse linealmente con:"
     pushTac `(tactic|Combinemos [$hyp.ident:term, ?_])
     pushCom "sustituyendo el signo de interrogación por uno o varios términos que demuestren igualdades o desigualdades."
 
@@ -211,7 +211,7 @@ implement_endpoint (lang := es) helpSinceIneqSuggestion (hyp : Name) (stmt goal 
     pushTac `(tactic|Como $stmt:term concluimos que  $goal)
   else do
     flush
-    pushCom "Puede usarse en algún cálculo o combinación lineal con:"
+    pushCom "También puede usarse en algún paso de cálculo, o combinarse linealmente con:"
     pushTac `(tactic| Como $stmt:term ,y ?_ concluimos que  $goal)
     pushCom "sustituyendo el signo de interrogación por uno o varios términos que demuestren igualdades o desigualdades."
 
@@ -245,7 +245,7 @@ implement_endpoint (lang := es) helpGenericMemSuggestion (hyp : Name) : Suggesti
 
 implement_endpoint (lang := es) helpContradictionSuggestion (hypId : Ident) : SuggestionM Unit := do
   pushComment <| "Esta hipótesis es una contradicción."
-  pushCom "Se puede deducir cualquier cosa con:"
+  pushCom "Se puede deducir cualquier cosa de ella con:"
   pushTac `(tactic|(Probemos que hay una contradicción
                     Concluimos por $hypId:ident))
 
@@ -513,7 +513,7 @@ implement_endpoint (lang := es) helpImplicationGoalNLSuggestion (headDescr : Str
 
 implement_endpoint (lang := es) helpEquivalenceGoalSuggestion (mpF mrF : Format) (mpS mrS : Term) :
     SuggestionM Unit := do
-  pushCom "El objetivo es una equivalencia (↔). Se puede demostrar la implicación de izquierda a derecha con:"
+  pushCom "El objetivo es una equivalencia (↔). Se puede anunciar la demostración de la implicación de izquierda a derecha con:"
   pushTac `(tactic|Primero probemos que $mpS)
   pushCom "Una vez demostrada esta primera afirmación, quedará por demostrar que {mrF}"
   flush
@@ -568,7 +568,7 @@ implement_endpoint (lang := es) helpIneqGoalSuggestion (goal : Term) (rel : Stri
   pushCom "El objetivo es una desigualdad"
   pushCom "Se puede probar mediante cálculos usando"
   pushTac `(tactic|Por desarrollo $goal:term since?)
-  pushCom "El último cálculo no es necesariamente una igualdad, puede ser una desigualdad."
+  pushCom "La última línea del cálculo no es necesariamente una igualdad, puede ser una desigualdad."
   pushCom "De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación "
   pushCom "deben componerse para obtener {rel}"
   flush
@@ -579,7 +579,7 @@ implement_endpoint (lang := es) helpSinceIneqGoalSuggestion (goal : Term) (rel :
   pushCom "El objetivo es una desigualdad"
   pushCom "Se puede probar mediante cálculos usando"
   pushTac `(tactic|Por desarrollo $goal:term since?)
-  pushCom "El último cálculo no es necesariamente una igualdad, puede ser una desigualdad."
+  pushCom "La última línea del cálculo no es necesariamente una igualdad, puede ser una desigualdad."
   pushCom "De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación "
   pushCom "deben componerse para obtener {rel}"
   flush
@@ -619,13 +619,13 @@ implement_endpoint (lang := es) helpSinceFalseGoalSuggestion (goal : Term) : Sug
   pushCom "El objetivo es demostrar que se da una contradicción"
   pushCom "Se puede aplicar una hipótesis que sea una negación"
   pushCom "es decir, una hipótesis de la forma P → falso."
-  pushCom "También puedes combinar dos hipótesis que claramente se contradigan usando: "
+  pushCom "También puedes combinar dos hechos que claramente se contradigan usando: "
   pushTac `(tactic|Como ?_ ,y ?_ concluimos que  $goal)
   pushCom "sustituyendo los signos de interrogación por esos dos hechos que se deducen directamente de las hipótesis."
   flush
   pushCom "También se puede invocar un hecho claramente falso (como `0 = 1`) que se deduce directamente de una hipótesis."
   pushTac `(tactic|Como ?_ concluimos que  $goal)
-  pushCom "reemplazando el signo de interrogación por cualquier hecho claramente falso."
+  pushCom "reemplazando el signo de interrogación por este hecho claramente falso."
 
 implement_endpoint (lang := es) helpContraposeGoalSuggestion : SuggestionM Unit := do
   pushCom "El objetivo es una implicación."
