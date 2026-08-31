@@ -314,7 +314,7 @@ implement_endpoint (lang := es) helpSinceForAllRelExistsSimpleSuggestion (stmt :
   (stmtn₀ : Term) (stmtn₀Str headDescr : String) (t : Format) (p'S : Term) : SuggestionM Unit := do
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $stmt:term ,y $stmtn₀ tenemos que $n'.ident:ident ,y $p'S)
+  pushTac `(tactic|Como $stmt:term ,y $stmtn₀ obtenemos $n'.ident:ident tal que $p'S)
   pushCom "donde {n₀} es {describe t} y la relación {stmtn₀Str} se sigue inmediatamente de alguna hipótesis."
   pushComment <| libre n'.ident
 
