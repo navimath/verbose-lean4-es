@@ -128,10 +128,10 @@ implement_endpoint (lang := es) helpSinceImplicationSuggestion (stmt goalS leS :
 
 implement_endpoint (lang := es) helpEquivalenceSuggestion (hyp hyp'N : Name) (l r : Expr) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es una equivalencia"
-  pushCom "Se puede reemplazar el lado izquierdo ({← l.fmt}) con el lado derecho ({← r.fmt}) en el objetivo con:"
+  pushCom "Se puede sustituir el lado izquierdo ({← l.fmt}) con el lado derecho ({← r.fmt}) en el objetivo con:"
   pushTac `(tactic|Reescribimos usando $hyp.ident:term)
   flush
-  pushCom "Se puede reemplazar el lado derecho del objetivo con:"
+  pushCom "Se puede sustituir el lado derecho del objetivo con:"
   pushTac `(tactic|Reescribimos usando ← $hyp.ident)
   flush
   pushCom "También se puede aplicar la misma sustitución en {hyp'N} con:"
@@ -143,13 +143,13 @@ implement_endpoint (lang := es) helpEquivalenceSuggestion (hyp hyp'N : Name) (l 
 implement_endpoint (lang := es) helpSinceEquivalenceSuggestion
     (hyp : Name) (stmt : Term) (l r : Expr) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es una equivalencia"
-  pushCom "Se puede reemplazar el lado izquierdo ({← l.fmt}) con el lado derecho ({← r.fmt}) o viceversa en el objetivo con:"
+  pushCom "Se puede sustituir el lado izquierdo ({← l.fmt}) con el lado derecho ({← r.fmt}) o viceversa en el objetivo con:"
   pushTac `(tactic|Como $stmt:term basta probar que ?_)
   pushCom "reemplazando el signo de interrogación por el nuevo objetivo."
   flush
   pushCom "Estas sustituciones también se pueden aplicar en una afirmación que se derive de alguna de las hipótesis actuales con:"
   pushTac `(tactic|Como $stmt:term ,y ?_ tenemos que ?_)
-  pushCom "reemplazando el primer signo de interrogación por la información que quieras sustituir, luego sustituye el segundo por el nuevo dato obtenido."
+  pushCom "reemplazando el primer signo de interrogación por la información que quieras sustituir, y el segundo por el nuevo dato obtenido."
 
 implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : Bool) (l r : String) :
     SuggestionM Unit := do
@@ -159,10 +159,10 @@ implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : 
     pushComment   "Se puede usar con:"
     pushTac `(tactic|Concluimos por $hyp.ident:ident)
   else do
-    pushCom "Puedes sustituir el lado izquierdo (es decir, {l}) por el lado derecho (es decir, {r}) en el objetivo con:"
+    pushCom "Se puede sustituir el lado izquierdo (es decir, {l}) por el lado derecho (es decir, {r}) en el objetivo con:"
     pushTac `(tactic|Reescribimos usando $hyp.ident:ident)
     flush
-    pushCom "Puedes sustituir la parte derecha del objetivo por:"
+    pushCom "Se puede sustituir la parte derecha del objetivo con:"
     pushTac `(tactic|Reescribimos usando ← $hyp.ident:ident)
     flush
     pushCom "También puedes hacer las mismas sustituciones en otra hipótesis {hyp'} con: "
@@ -181,16 +181,16 @@ implement_endpoint (lang := es) helpSinceEqualSuggestion (hyp : Name)
   let eq ← `($leS = $reS)
   if closes then
     pushComment <| s!"El objetivo actual es inmediato"
-    pushComment   "La puedes usar con:"
+    pushComment   "Se puede usar con:"
     pushTac `(tactic|Como $eq:term concluimos que  $goalS)
   else do
-    pushCom "Puedes sustituir el lado izquierdo (es decir, {l}) por el lado derecho (es decir, {r}) o viceversa en el objetivo con: "
+    pushCom "Se puede sustituir el lado izquierdo (es decir, {l}) por el lado derecho (es decir, {r}) o viceversa en el objetivo con: "
     pushTac `(tactic|Como $eq:term basta probar que ?_)
     pushCom "reemplazando el signo de interrogación por un nuevo objetivo."
     flush
-    pushCom "También se pueden realizar tales sustituciones en una expresión derivada de una de las hipótesis actuales mediante: "
+    pushCom "Estas sustituciones también se pueden aplicar en una afirmación que se derive de alguna de las hipótesis actuales con: "
     pushTac `(tactic|Como $eq:term ,y ?_ tenemos que ?_)
-    pushCom "sustituyendo el primer signo de interrogación por el dato que quieras sustituir, luego sustituye el segundo por el nuevo dato obtenido."
+    pushCom "sustituyendo el primer signo de interrogación por el dato que quieras sustituir, y el segundo por el nuevo dato obtenido."
 
 implement_endpoint (lang := es) helpIneqSuggestion (hyp : Name) (closes : Bool) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es una desigualdad"
@@ -252,7 +252,7 @@ implement_endpoint (lang := es) helpContradictionSuggestion (hypId : Ident) : Su
 implement_endpoint (lang := es) helpSinceContradictionSuggestion
      (stmt goal : Term) : SuggestionM Unit := do
   pushComment <| "Esta hipótesis es una contradicción."
-  pushCom "Puedes deducir el objetivo de ella con:"
+  pushCom "Se puede deducir el objetivo de ella con:"
   pushTac `(tactic|Como $stmt:term concluimos que  $goal)
 
 implement_endpoint (lang := es) helpSubsetSuggestion (hyp x hx hx' : Name)
@@ -298,7 +298,7 @@ implement_endpoint (lang := es) helpSinceForAllRelExistsRelSuggestion (stmt :
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
   pushTac `(tactic|Como $stmt:term ,y $stmtn₀ obtenemos $var_name'.ident:ident tal que $ineqS ,y $p'S)
-  pushCom "donde {n₀} es {describe t} y la relación {stmtn₀Str} se sigue inmediatamente por alguna hipótesis."
+  pushCom "donde {n₀} es {describe t} y la relación {stmtn₀Str} se sigue inmediatamente de alguna hipótesis."
   pushComment <| libre var_name'.ident
 
 implement_endpoint (lang := es) helpForAllRelExistsSimpleSuggestion (hyp n' hn' n₀ hn₀ : Name)
@@ -315,7 +315,7 @@ implement_endpoint (lang := es) helpSinceForAllRelExistsSimpleSuggestion (stmt :
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
   pushTac `(tactic|Como $stmt:term ,y $stmtn₀ tenemos que $n'.ident:ident ,y $p'S)
-  pushCom "donde {n₀} es {describe t} y la relación {stmtn₀Str} se sigue directamente de alguna hipótesis."
+  pushCom "donde {n₀} es {describe t} y la relación {stmtn₀Str} se sigue inmediatamente de alguna hipótesis."
   pushComment <| libre n'.ident
 
 implement_endpoint (lang := es) helpForAllRelGenericSuggestion (hyp n₀ hn₀ : Name)
@@ -381,7 +381,7 @@ implement_endpoint (lang := es) helpSinceForAllSimpleForAllRelSuggestion (stmt r
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
   pushTac `(tactic|Como $stmt:term ,y $rel₀S:term tenemos que $p'S:term)
-  pushCom "donde {nn₀} y {var_name'₀} son {describe_pl t} y {rel₀} se sigue inmediatamente por alguna hipótesis."
+  pushCom "donde {nn₀} y {var_name'₀} son {describe_pl t} y {rel₀} se sigue inmediatamente de alguna hipótesis."
 
 implement_endpoint (lang := es) helpForAllSimpleGenericSuggestion (hyp nn₀ hn₀ : Name) (headDescr : String)
     (t : Format) (pS : Term) : SuggestionM Unit := do
@@ -583,7 +583,7 @@ implement_endpoint (lang := es) helpSinceIneqGoalSuggestion (goal : Term) (rel :
   pushCom "De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación "
   pushCom "deben componerse para obtener {rel}"
   flush
-  pushCom "Si esta desigualdad se sigue directamente de una hipótesis, se puede usar:"
+  pushCom "Si esta desigualdad se sigue inmediatamente de una hipótesis, se puede usar:"
   pushTac `(tactic|Como ?_ concluimos que  $goal)
   pushCom "sustituyendo el signo de interrogación por el enunciado de la hipótesis."
 
@@ -621,9 +621,9 @@ implement_endpoint (lang := es) helpSinceFalseGoalSuggestion (goal : Term) : Sug
   pushCom "es decir, una hipótesis de la forma P → falso."
   pushCom "También puedes combinar dos hechos que claramente se contradigan usando: "
   pushTac `(tactic|Como ?_ ,y ?_ concluimos que  $goal)
-  pushCom "sustituyendo los signos de interrogación por esos dos hechos que se deducen directamente de las hipótesis."
+  pushCom "sustituyendo los signos de interrogación por esos dos hechos que se deducen inmediatamente de las hipótesis."
   flush
-  pushCom "También se puede invocar un hecho claramente falso (como `0 = 1`) que se deduce directamente de una hipótesis."
+  pushCom "También se puede invocar un hecho claramente falso (como `0 = 1`) que se deduce inmediatamente de una hipótesis."
   pushTac `(tactic|Como ?_ concluimos que  $goal)
   pushCom "reemplazando el signo de interrogación por este hecho claramente falso."
 
