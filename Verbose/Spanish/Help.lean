@@ -165,7 +165,7 @@ implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : 
     pushCom "Se puede sustituir la parte derecha del objetivo con:"
     pushTac `(tactic|Reescribimos usando ← $hyp.ident:ident)
     flush
-    pushCom "También puedes hacer las mismas sustituciones en otra hipótesis {hyp'} con: "
+    pushCom "También puedes hacer las mismas sustituciones en otra hipótesis {hyp'} con:"
     pushTac `(tactic|Reescribimos usando $hyp.ident:ident en la hipótesis $hyp'.ident:ident)
     flush
     pushCom "o"
@@ -184,11 +184,11 @@ implement_endpoint (lang := es) helpSinceEqualSuggestion (hyp : Name)
     pushComment   "Se puede usar con:"
     pushTac `(tactic|Como $eq:term concluimos que  $goalS)
   else do
-    pushCom "Se puede sustituir el lado izquierdo (es decir, {l}) por el lado derecho (es decir, {r}) o viceversa en el objetivo con: "
+    pushCom "Se puede sustituir el lado izquierdo (es decir, {l}) por el lado derecho (es decir, {r}) o viceversa en el objetivo con:"
     pushTac `(tactic|Como $eq:term basta probar que ?_)
     pushCom "reemplazando el signo de interrogación por un nuevo objetivo."
     flush
-    pushCom "Estas sustituciones también se pueden aplicar en una afirmación que se derive de alguna de las hipótesis actuales con: "
+    pushCom "Estas sustituciones también se pueden aplicar en una afirmación que se derive de alguna de las hipótesis actuales con:"
     pushTac `(tactic|Como $eq:term ,y ?_ tenemos que ?_)
     pushCom "sustituyendo el primer signo de interrogación por el dato que quieras sustituir, y el segundo por el nuevo dato obtenido."
 
@@ -446,7 +446,7 @@ def descrGoalShape (headDescr : String) : SuggestionM Unit :=
  pushCom "El objetivo tiene la forma “{headDescr}”"
 
 def descrDirectProof : SuggestionM Unit :=
- pushCom "Luego una demostración directa puede empezar con: "
+ pushCom "Luego una demostración directa puede empezar con:"
 
 implement_endpoint (lang := es) helpUnfoldableGoalSuggestion (expandedGoalTypeS : Term) :
     SuggestionM Unit := do
@@ -517,7 +517,7 @@ implement_endpoint (lang := es) helpEquivalenceGoalSuggestion (mpF mrF : Format)
   pushTac `(tactic|Primero probemos que $mpS)
   pushCom "Una vez demostrada esta primera afirmación, quedará por demostrar que {mrF}"
   flush
-  pushCom "También se puede empezar por: "
+  pushCom "También se puede empezar por:"
   pushTac `(tactic|Primero probemos que $mrS)
   pushCom "Entonces, una vez terminada esta primera demostración, quedará por demostrar que {mpF}"
 
@@ -589,7 +589,7 @@ implement_endpoint (lang := es) helpSinceIneqGoalSuggestion (goal : Term) (rel :
 
 implement_endpoint (lang := es) helpMemInterGoalSuggestion (elem le : Expr) : SuggestionM Unit := do
   pushCom "El objetivo es demostrar que {← elem.fmt} pertenece a la intersección de {← le.fmt} con otro conjunto."
-  pushCom "Luego una demostración directa empezaría con: "
+  pushCom "Luego una demostración directa empezaría con:"
   pushTac `(tactic|Primero probemos que $(← elem.stx) ∈ $(← le.stx))
 
 implement_endpoint (lang := es) helpMemUnionGoalSuggestion (elem le re : Expr) : SuggestionM Unit := do
@@ -619,7 +619,7 @@ implement_endpoint (lang := es) helpSinceFalseGoalSuggestion (goal : Term) : Sug
   pushCom "El objetivo es demostrar que se da una contradicción"
   pushCom "Se puede aplicar una hipótesis que sea una negación"
   pushCom "es decir, una hipótesis de la forma P → falso."
-  pushCom "También puedes combinar dos hechos que claramente se contradigan usando: "
+  pushCom "También puedes combinar dos hechos que claramente se contradigan usando:"
   pushTac `(tactic|Como ?_ ,y ?_ concluimos que  $goal)
   pushCom "sustituyendo los signos de interrogación por esos dos hechos que se deducen inmediatamente de las hipótesis."
   flush
