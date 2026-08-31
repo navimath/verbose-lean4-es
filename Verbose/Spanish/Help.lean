@@ -36,17 +36,17 @@ match toString t with
 
 def describe_pl (t : Format) : String :=
 match toString t with
-| "ℝ" => "unos números reales"
-| "ℕ" => "unos números naturales"
-| "ℤ" => "unos números enteros"
-| t => "unas expresiones de tipo " ++ t
+| "ℝ" => "números reales"
+| "ℕ" => "números naturales"
+| "ℤ" => "números enteros"
+| t => "expresiones de tipo " ++ t
 
-def libre (s : Ident) : String := s!"El nombre {s.getId} puede libremente ser escogido entre los nombres disponibles."
+def libre (s : Ident) : String := s!"El nombre {s.getId} puede ser escogido libremente entre los nombres disponibles."
 
 def printIdentList (l : List Ident) : String := commaSep <| l.toArray.map (toString ·.getId)
 
 def libres (ls : List Ident) : String :=
-s!"Los nombres {printIdentList ls} pueden ser libremente escogidos entre los nombres disponibles."
+s!"Los nombres {printIdentList ls} pueden ser escogidos libremente entre los nombres disponibles."
 
 def describeHypShape (hyp : Name) (headDescr : String) : SuggestionM Unit :=
   pushCom "La hipótesis {hyp} es de la forma “{headDescr}”"
@@ -84,7 +84,7 @@ implement_endpoint (lang := es) helpSinceConjunctionSuggestion (hyp : Name) (p�
   pushTac `(tactic|Como $p₁S:term ∧ $p₂S se tiene que $p₁S:term ,y $p₂S)
 
 implement_endpoint (lang := es) helpDisjunctionSuggestion (hyp : Name) : SuggestionM Unit := do
-  pushCom "La hipótesis {hyp} tiene forma de « ... o ... »"
+  pushCom "La hipótesis {hyp} es de la forma « ... o ... »"
   pushCom "Se puede usar con:"
   pushTac `(tactic|Procedemos usando $hyp.ident:term)
 
@@ -115,7 +115,7 @@ implement_endpoint (lang := es) helpSinceImplicationSuggestion (stmt goalS leS :
   pushCom "La hipótesis {hyp} es una implicación"
   if closes then do
     pushCom "La conclusión de esta implicación es el objetivo actual"
-    pushCom "Entonces, uno puede usar esta hipótesis con:"
+    pushCom "Entonces, se puede usar esta hipótesis con:"
     pushTac `(tactic| Como $stmt:term basta probar que $(← le.stx):term)
     flush
     pushCom "Si ya tienes una prueba de {← le.fmt} puedes probar con:"
@@ -593,7 +593,7 @@ implement_endpoint (lang := es) helpMemInterGoalSuggestion (elem le : Expr) : Su
   pushTac `(tactic|Primero probemos que $(← elem.stx) ∈ $(← le.stx))
 
 implement_endpoint (lang := es) helpMemUnionGoalSuggestion (elem le re : Expr) : SuggestionM Unit := do
-  pushCom "El objetivo es demostrar que {← elem.fmt} pertenece a la unión de {← le.fmt} con {← re.fmt}."
+  pushCom "El objetivo es demostrar que {← elem.fmt} pertenece a la unión de {← le.fmt} y {← re.fmt}."
   descrDirectProof
   pushTac `(tactic|Probemos que $(← elem.stx) ∈ $(← le.stx))
   flush
@@ -654,7 +654,7 @@ implement_endpoint (lang := es) helpNegationGoalSuggestion (hyp : Ident) (p : Fo
   pushCom "El objetivo es la negación de {p}, es decir, {p} implica una contradicción"
   pushCom "Luego una prueba directa empieza con:"
   pushTac `(tactic| Supongamos $hyp:ident : $assum)
-  pushCom "Luego solo queda demostrar la contradicción."
+  pushCom "Por tanto solo queda demostrar la contradicción."
 
 open Verbose.NameLess in
 implement_endpoint (lang := es) helpNegationNLGoalSuggestion (p : Format) (assum : Term) :
@@ -662,7 +662,7 @@ implement_endpoint (lang := es) helpNegationNLGoalSuggestion (p : Format) (assum
   pushCom "El objetivo es la negación de {p}, es decir, {p} implica una contradicción"
   pushCom "Luego una prueba directa empieza con:"
   pushTac `(tactic| Supongamos que $assum)
-  pushCom "Luego solo queda demostrar la contradicción."
+  pushCom "Por tanto solo queda demostrar la contradicción."
 
 open Verbose.Named in
 implement_endpoint (lang := es) helpNeGoalSuggestion (l r : Format) (lS rS : Term) (Hyp : Ident):
@@ -670,7 +670,7 @@ implement_endpoint (lang := es) helpNeGoalSuggestion (l r : Format) (lS rS : Ter
   pushCom "El objetivo es la negación de {l} = {r}, es decir, {l} = {r} implica una contradicción"
   pushCom "Luego una prueba directa empieza con:"
   pushTac `(tactic| Supongamos $Hyp:ident : $lS = $rS)
-  pushCom "Luego solo queda demostrar la contradicción."
+  pushCom "Por tanto solo queda demostrar la contradicción."
 
 open Verbose.NameLess in
 implement_endpoint (lang := es) helpNeGoalNLSuggestion (l r : Format) (lS rS : Term) :
@@ -678,7 +678,7 @@ implement_endpoint (lang := es) helpNeGoalNLSuggestion (l r : Format) (lS rS : T
   pushCom "El objetivo es la negación de {l} = {r}, es decir, {l} = {r} implica una contradicción"
   pushCom "Luego una prueba directa empieza con:"
   pushTac `(tactic| Supongamos que $lS = $rS)
-  pushCom "Luego solo quedaría demostrar la contradicción."
+  pushCom "Por tanto solo quedaría demostrar la contradicción."
 
 setLang es
 
