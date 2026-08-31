@@ -279,7 +279,7 @@ implement_endpoint (lang := es) assumptionUnfoldingSuggestion (hypId : Ident) (e
     SuggestionM Unit := do
   pushCom "Esta hipótesis empieza aplicando una definición."
   pushCom "Puedes hacerla explícita con:"
-  pushTac `(tactic|Reformulamos $hypId:ident como$expandedHypTypeS)
+  pushTac `(tactic|Reformulamos $hypId:ident como $expandedHypTypeS)
   flush
 
 implement_endpoint (lang := es) helpForAllRelExistsRelSuggestion (hyp var_name' n₀ hn₀ : Name)
