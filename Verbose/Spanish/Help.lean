@@ -446,7 +446,7 @@ def descrGoalShape (headDescr : String) : SuggestionM Unit :=
  pushCom "El objetivo tiene la forma “{headDescr}”"
 
 def descrDirectProof : SuggestionM Unit :=
- pushCom "Luego una demostración directa puede empezar con:"
+ pushCom "Luego una demostración directa empezaría con:"
 
 implement_endpoint (lang := es) helpUnfoldableGoalSuggestion (expandedGoalTypeS : Term) :
     SuggestionM Unit := do
@@ -616,7 +616,7 @@ implement_endpoint (lang := es) helpFalseGoalSuggestion : SuggestionM Unit := do
   pushCom "es decir, una hipótesis de la forma P → falso."
 
 implement_endpoint (lang := es) helpSinceFalseGoalSuggestion (goal : Term) : SuggestionM Unit := do
-  pushCom "El objetivo es demostrar que se da una contradicción"
+  pushCom "El objetivo es demostrar que se da una contradicción."
   pushCom "Se puede aplicar una hipótesis que sea una negación"
   pushCom "es decir, una hipótesis de la forma P → falso."
   pushCom "También puedes combinar dos hechos que claramente se contradigan usando:"
