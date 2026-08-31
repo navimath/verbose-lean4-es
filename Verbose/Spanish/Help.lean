@@ -421,7 +421,7 @@ implement_endpoint (lang := es) helpSinceExistsSimpleSuggestion (stmt : Term) (h
     (pS : Term) : SuggestionM Unit := do
   describeHypShape hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic| Como $stmt:term tenemos que $n.ident:ident ,y $pS)
+  pushTac `(tactic| Como $stmt:term obtenemos $n.ident:ident tal que $pS)
   pushComment <| libre n.ident
 
 implement_endpoint (lang := es) helpDataSuggestion (hyp : Name) (t : Format) : SuggestionM Unit := do
