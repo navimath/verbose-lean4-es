@@ -101,11 +101,11 @@ implement_endpoint (lang := es) helpImplicationSuggestion (hyp HN H'N : Name) (c
     pushCom "Entonces se puede usar esta hipótesis con:"
     pushTac `(tactic| Por $hyp.ident:term basta probar que $(← le.stx))
     flush
-    pushCom "Si se tiene una demostración de {← le.fmt}, se puede usar:"
+    pushCom "Si ya se tiene una demostración {HN} de {← le.fmt}, se puede usar:"
     pushTac `(tactic|Concluimos por $hyp.ident:term aplicado a $HN.ident)
   else do
     pushCom "La premisa de esta implicación es {← le.fmt}"
-    pushCom "Si se tiene una demostración {HN} of {← le.fmt}"
+    pushCom "Si se tiene una demostración {HN} de {← le.fmt}"
     pushCom "Puedes usar esta hipótesis con:"
     pushTac `(tactic|Por $hyp.ident:term aplicado a $HN.ident:term tenemos $H'N.ident:ident : $(← re.stx):term)
     pushComment <| libre H'N.ident
@@ -155,7 +155,7 @@ implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : 
     SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es una igualdad"
   if closes then
-    pushComment <| s!"El objetivo actual es se deriva inmediatamente de esta."
+    pushComment <| s!"El objetivo actual se deriva inmediatamente de esta."
     pushComment   "Se puede usar con:"
     pushTac `(tactic|Concluimos por $hyp.ident:ident)
   else do
