@@ -186,7 +186,7 @@ implement_endpoint (lang := es) helpSinceEqualSuggestion (hyp : Name)
   else do
     pushCom "Se puede sustituir el lado izquierdo (es decir, {l}) por el lado derecho (es decir, {r}) o viceversa en el objetivo con:"
     pushTac `(tactic|Como $eq:term basta probar que ?_)
-    pushCom "reemplazando el signo de interrogación por un nuevo objetivo."
+    pushCom "reemplazando el signo de interrogación por el nuevo objetivo."
     flush
     pushCom "Estas sustituciones también se pueden aplicar en una afirmación que se derive de alguna de las hipótesis actuales con:"
     pushTac `(tactic|Como $eq:term ,y ?_ tenemos que ?_)
