@@ -530,7 +530,7 @@ implement_endpoint (lang := es) helpSetEqSuggestion (lS rS : Term) : SuggestionM
   pushTac `(tactic|Por desarrollo $lS:term = $rS since?)
   flush
   pushCom "También puede demostrarse por doble inclusión."
-  pushCom "En tal caso, la demostración empezaría por:"
+  pushCom "En tal caso, la demostración empieza por:"
   pushTac `(tactic|Primero probemos que $lS ⊆ $rS)
 
 implement_endpoint (lang := es) helpSinceSetEqSuggestion (lS rS : Term) : SuggestionM Unit := do
@@ -542,7 +542,7 @@ implement_endpoint (lang := es) helpSinceSetEqSuggestion (lS rS : Term) : Sugges
   pushTac `(tactic|Por desarrollo $lS:term = $rS since?)
   flush
   pushCom "También puede demostrarse por doble inclusión."
-  pushCom "En tal caso, la demostración empezaría por:"
+  pushCom "En tal caso, la demostración empieza por:"
   pushTac `(tactic|Primero probemos que $lS ⊆ $rS)
 
 implement_endpoint (lang := es) helpEqGoalSuggestion (lS rS : Term) : SuggestionM Unit := do
