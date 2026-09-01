@@ -122,7 +122,7 @@ implement_endpoint (lang := es) helpSinceImplicationSuggestion (stmt goalS leS :
     pushTac `(tactic|Como $stmt:term ,y $(← le.stx):term concluimos que $goalS)
   else do
     pushCom "La premisa de esta implicación es {← le.fmt}"
-    pushCom "Si ya se tiene una demostración de {← le.fmt}"
+    pushCom "Si se tiene una demostración de {← le.fmt}"
     pushCom "Puedes usar esta hipótesis con:"
     pushTac `(tactic|Como $stmt:term ,y $leS:term tenemos que $(← re.stx):term)
 
