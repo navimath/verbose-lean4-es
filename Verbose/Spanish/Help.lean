@@ -118,11 +118,11 @@ implement_endpoint (lang := es) helpSinceImplicationSuggestion (stmt goalS leS :
     pushCom "Entonces, se puede usar esta hipótesis con:"
     pushTac `(tactic| Como $stmt:term basta probar que $(← le.stx):term)
     flush
-    pushCom "Si ya tienes una prueba de {← le.fmt}, puedes usar:"
+    pushCom "Si ya se tiene una demostración de {← le.fmt}, puedes usar:"
     pushTac `(tactic|Como $stmt:term ,y $(← le.stx):term concluimos que $goalS)
   else do
     pushCom "La premisa de esta implicación es {← le.fmt}"
-    pushCom "Si tienes una prueba de {← le.fmt}"
+    pushCom "Si ya se tiene una demostración de {← le.fmt}"
     pushCom "Puedes usar esta hipótesis con:"
     pushTac `(tactic|Como $stmt:term ,y $leS:term tenemos que $(← re.stx):term)
 
@@ -165,7 +165,7 @@ implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : 
     pushCom "Se puede sustituir el lado derecho del objetivo con:"
     pushTac `(tactic|Reescribimos usando ← $hyp.ident:ident)
     flush
-    pushCom "También puedes hacer las mismas sustituciones en otra hipótesis {hyp'} con:"
+    pushCom "También se pueden aplicar las mismas sustituciones en otra hipótesis {hyp'} con:"
     pushTac `(tactic|Reescribimos usando $hyp.ident:ident en la hipótesis $hyp'.ident:ident)
     flush
     pushCom "o"
@@ -278,7 +278,7 @@ implement_endpoint (lang := es) assumptionClosesSuggestion (hypId : Ident) : Sug
 implement_endpoint (lang := es) assumptionUnfoldingSuggestion (hypId : Ident) (expandedHypTypeS : Term) :
     SuggestionM Unit := do
   pushCom "Esta hipótesis empieza aplicando una definición."
-  pushCom "Puedes hacerla explícita con:"
+  pushCom "Se puede hacer explícita con:"
   pushTac `(tactic|Reformulamos $hypId:ident como $expandedHypTypeS)
   flush
 
@@ -553,7 +553,7 @@ implement_endpoint (lang := es) helpEqGoalSuggestion (lS rS : Term) : Suggestion
   pushCom "o mediante cálculos usando"
   pushTac `(tactic|Por desarrollo $lS:term = $rS since?)
   flush
-  pushCom "También puedes aplicar una combinación lineal de tus hipótesis con:"
+  pushCom "También se puede aplicar una combinación lineal de las hipótesis con:"
   pushTac `(tactic|Combinemos [?_, ?_])
 
 implement_endpoint (lang := es) helpSinceEqGoalSuggestion (goal : Term) : SuggestionM Unit := do
@@ -572,7 +572,7 @@ implement_endpoint (lang := es) helpIneqGoalSuggestion (goal : Term) (rel : Stri
   pushCom "De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación "
   pushCom "deben componerse para obtener {rel}"
   flush
-  pushCom "También puedes aplicar una combinación lineal de tus hipótesis con:"
+  pushCom "También se puede aplicar una combinación lineal de las hipótesis con:"
   pushTac `(tactic| Combinemos [?_, ?_])
 
 implement_endpoint (lang := es) helpSinceIneqGoalSuggestion (goal : Term) (rel : String) : SuggestionM Unit := do
@@ -619,7 +619,7 @@ implement_endpoint (lang := es) helpSinceFalseGoalSuggestion (goal : Term) : Sug
   pushCom "El objetivo es demostrar que se da una contradicción."
   pushCom "Se puede aplicar una hipótesis que sea una negación"
   pushCom "es decir, una hipótesis de la forma P → falso."
-  pushCom "También puedes combinar dos hechos que claramente se contradigan usando:"
+  pushCom "También se pueden combinar dos hechos que claramente se contradigan usando:"
   pushTac `(tactic|Como ?_ ,y ?_ concluimos que  $goal)
   pushCom "sustituyendo los signos de interrogación por esos dos hechos que se deducen inmediatamente de las hipótesis."
   flush
