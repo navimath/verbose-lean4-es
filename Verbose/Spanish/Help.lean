@@ -173,7 +173,7 @@ implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : 
     flush
     pushCom "También puede usarse en algún paso de cálculo, o combinarse linealmente con otras usando:"
     pushTac `(tactic|Combinemos [$hyp.ident:term, ?_])
-    pushCom "sustituyendo el signo de interrogación por uno o varios términos que demuestren las igualdades."
+    pushCom "sustituyendo el signo de interrogación por uno o varios términos que demuestren igualdades."
 
 implement_endpoint (lang := es) helpSinceEqualSuggestion (hyp : Name)
     (closes : Bool) (l r : String) (leS reS goalS : Term) : SuggestionM Unit := do
