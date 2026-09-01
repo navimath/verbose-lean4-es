@@ -162,7 +162,7 @@ implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : 
     pushCom "Se puede sustituir el lado izquierdo (es decir, {l}) por el lado derecho (es decir, {r}) en el objetivo con:"
     pushTac `(tactic|Reescribimos usando $hyp.ident:ident)
     flush
-    pushCom "Se puede sustituir la parte derecha del objetivo con:"
+    pushCom "Se puede sustituir el lado derecho del objetivo con:"
     pushTac `(tactic|Reescribimos usando ← $hyp.ident:ident)
     flush
     pushCom "También puedes hacer las mismas sustituciones en otra hipótesis {hyp'} con:"
