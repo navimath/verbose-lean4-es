@@ -654,7 +654,7 @@ implement_endpoint (lang := es) helpNegationGoalSuggestion (hyp : Ident) (p : Fo
   pushCom "El objetivo es la negación de {p}, es decir, {p} implica una contradicción"
   pushCom "Luego una prueba directa empieza con:"
   pushTac `(tactic| Supongamos $hyp:ident : $assum)
-  pushCom "Por tanto solo queda demostrar la contradicción."
+  pushCom "Por tanto solo queda demostrar una contradicción."
 
 open Verbose.NameLess in
 implement_endpoint (lang := es) helpNegationNLGoalSuggestion (p : Format) (assum : Term) :
@@ -662,7 +662,7 @@ implement_endpoint (lang := es) helpNegationNLGoalSuggestion (p : Format) (assum
   pushCom "El objetivo es la negación de {p}, es decir, {p} implica una contradicción"
   pushCom "Luego una prueba directa empieza con:"
   pushTac `(tactic| Supongamos que $assum)
-  pushCom "Por tanto solo queda demostrar la contradicción."
+  pushCom "Por tanto solo queda demostrar una contradicción."
 
 open Verbose.Named in
 implement_endpoint (lang := es) helpNeGoalSuggestion (l r : Format) (lS rS : Term) (Hyp : Ident):
@@ -670,7 +670,7 @@ implement_endpoint (lang := es) helpNeGoalSuggestion (l r : Format) (lS rS : Ter
   pushCom "El objetivo es la negación de {l} = {r}, es decir, {l} = {r} implica una contradicción"
   pushCom "Luego una prueba directa empieza con:"
   pushTac `(tactic| Supongamos $Hyp:ident : $lS = $rS)
-  pushCom "Por tanto solo queda demostrar la contradicción."
+  pushCom "Por tanto solo queda demostrar una contradicción."
 
 open Verbose.NameLess in
 implement_endpoint (lang := es) helpNeGoalNLSuggestion (l r : Format) (lS rS : Term) :
@@ -678,7 +678,7 @@ implement_endpoint (lang := es) helpNeGoalNLSuggestion (l r : Format) (lS rS : T
   pushCom "El objetivo es la negación de {l} = {r}, es decir, {l} = {r} implica una contradicción"
   pushCom "Luego una prueba directa empieza con:"
   pushTac `(tactic| Supongamos que $lS = $rS)
-  pushCom "Por tanto solo quedaría demostrar la contradicción."
+  pushCom "Por tanto solo queda demostrar una contradicción."
 
 setLang es
 
