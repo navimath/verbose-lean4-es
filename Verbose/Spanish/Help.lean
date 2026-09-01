@@ -487,7 +487,7 @@ implement_endpoint (lang := es) helpConjunctionGoalSuggestion (p p' : Term) : Su
   flush
   pushCom "También se puede empezar con:"
   pushTac `(tactic|Primero probemos que $p')
-  pushCom "Una vez terminada esta primera demostración, quedará por demostrar que {← p.fmt}"
+  pushCom "entonces, una vez terminada esta primera demostración, quedará por demostrar que {← p.fmt}"
 
 implement_endpoint (lang := es) helpDisjunctionGoalSuggestion (p p' : Term) : SuggestionM Unit := do
   descrGoalShape "... o ..."
@@ -519,7 +519,7 @@ implement_endpoint (lang := es) helpEquivalenceGoalSuggestion (mpF mrF : Format)
   flush
   pushCom "También se puede empezar con:"
   pushTac `(tactic|Primero probemos que $mrS)
-  pushCom "Entonces, una vez terminada esta primera demostración, quedará por demostrar que {mpF}"
+  pushCom "entonces, una vez terminada esta primera demostración, quedará por demostrar que {mpF}"
 
 implement_endpoint (lang := es) helpSetEqSuggestion (lS rS : Term) : SuggestionM Unit := do
   pushCom "El objetivo es una igualdad entre conjuntos"
