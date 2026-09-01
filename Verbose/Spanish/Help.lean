@@ -171,7 +171,7 @@ implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : 
     pushCom "o"
     pushTac `(tactic|Reescribimos usando ← $hyp.ident:ident en la hipótesis $hyp'.ident:ident)
     flush
-    pushCom "También puede usarse en algún paso de cálculo, o combinarse linealmente con:"
+    pushCom "También puede usarse en algún paso de cálculo, o combinarse linealmente con otras usando:"
     pushTac `(tactic|Combinemos [$hyp.ident:term, ?_])
     pushCom "sustituyendo el signo de interrogación por uno o varios términos que demuestren las igualdades."
 
@@ -199,7 +199,7 @@ implement_endpoint (lang := es) helpIneqSuggestion (hyp : Name) (closes : Bool) 
     pushCom "Se puede usar con:"
     pushTac `(tactic|Concluimos por $hyp.ident:ident)
   else do
-    pushCom "También puede usarse en algún paso de cálculo, o combinarse linealmente con:"
+    pushCom "También puede usarse en algún paso de cálculo, o combinarse linealmente con otras usando:"
     pushTac `(tactic|Combinemos [$hyp.ident:term, ?_])
     pushCom "sustituyendo el signo de interrogación por uno o varios términos que demuestren igualdades o desigualdades."
 
@@ -211,7 +211,7 @@ implement_endpoint (lang := es) helpSinceIneqSuggestion (hyp : Name) (stmt goal 
     pushTac `(tactic|Como $stmt:term concluimos que  $goal)
   else do
     flush
-    pushCom "También puede usarse en algún paso de cálculo, o combinarse linealmente con:"
+    pushCom "También puede usarse en algún paso de cálculo, o combinarse linealmente con otras usando:"
     pushTac `(tactic| Como $stmt:term ,y ?_ concluimos que  $goal)
     pushCom "sustituyendo el signo de interrogación por uno o varios términos que demuestren igualdades o desigualdades."
 
