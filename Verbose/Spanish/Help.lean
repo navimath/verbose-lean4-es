@@ -180,7 +180,7 @@ implement_endpoint (lang := es) helpSinceEqualSuggestion (hyp : Name)
   pushCom "La hipótesis {hyp} es una igualdad"
   let eq ← `($leS = $reS)
   if closes then
-    pushComment <| s!"El objetivo actual es inmediato"
+    pushComment <| s!"El objetivo actual se deriva inmediatamente de esta."
     pushComment   "Se puede usar con:"
     pushTac `(tactic|Como $eq:term concluimos que  $goalS)
   else do
