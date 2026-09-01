@@ -128,7 +128,7 @@ implement_endpoint (lang := es) helpSinceImplicationSuggestion (stmt goalS leS :
 
 implement_endpoint (lang := es) helpEquivalenceSuggestion (hyp hyp'N : Name) (l r : Expr) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es una equivalencia"
-  pushCom "Se puede sustituir el lado izquierdo (es decir, {← l.fmt}) por el lado derecho ({← r.fmt}) en el objetivo con:"
+  pushCom "Se puede sustituir el lado izquierdo (es decir, {← l.fmt}) por el lado derecho (es decir, {← r.fmt}) en el objetivo con:"
   pushTac `(tactic|Reescribimos usando $hyp.ident:term)
   flush
   pushCom "Se puede sustituir el lado derecho del objetivo con:"
@@ -143,7 +143,7 @@ implement_endpoint (lang := es) helpEquivalenceSuggestion (hyp hyp'N : Name) (l 
 implement_endpoint (lang := es) helpSinceEquivalenceSuggestion
     (hyp : Name) (stmt : Term) (l r : Expr) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es una equivalencia"
-  pushCom "Se puede sustituir el lado izquierdo (es decir, {← l.fmt}) por el lado derecho ({← r.fmt}) o viceversa en el objetivo con:"
+  pushCom "Se puede sustituir el lado izquierdo (es decir, {← l.fmt}) por el lado derecho (es decir, {← r.fmt}) o viceversa en el objetivo con:"
   pushTac `(tactic|Como $stmt:term basta probar que ?_)
   pushCom "reemplazando el signo de interrogación por el nuevo objetivo."
   flush
