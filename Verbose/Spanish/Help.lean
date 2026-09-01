@@ -98,7 +98,7 @@ implement_endpoint (lang := es) helpImplicationSuggestion (hyp HN H'N : Name) (c
   pushCom "La hipótesis {hyp} es una implicación"
   if closes then do
     pushCom "La conclusión de esta implicación es el objetivo actual"
-    pushCom "Entonces se puede usar esta hipótesis con:"
+    pushCom "Entonces, se puede usar esta hipótesis con:"
     pushTac `(tactic| Por $hyp.ident:term basta probar que $(← le.stx))
     flush
     pushCom "Si ya se tiene una demostración {HN} de {← le.fmt}, se puede usar:"
