@@ -569,7 +569,7 @@ implement_endpoint (lang := es) helpIneqGoalSuggestion (goal : Term) (rel : Stri
   pushCom "Se puede probar mediante cálculos usando"
   pushTac `(tactic|Por desarrollo $goal:term since?)
   pushCom "La última línea del cálculo no es necesariamente una igualdad, puede ser una desigualdad."
-  pushCom "De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación "
+  pushCom "De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación"
   pushCom "deben componerse para obtener {rel}"
   flush
   pushCom "También se puede aplicar una combinación lineal de las hipótesis con:"
@@ -580,7 +580,7 @@ implement_endpoint (lang := es) helpSinceIneqGoalSuggestion (goal : Term) (rel :
   pushCom "Se puede probar mediante cálculos usando"
   pushTac `(tactic|Por desarrollo $goal:term since?)
   pushCom "La última línea del cálculo no es necesariamente una igualdad, puede ser una desigualdad."
-  pushCom "De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación "
+  pushCom "De la misma forma, la primera línea puede ser una igualdad. Al final los símbolos de relación"
   pushCom "deben componerse para obtener {rel}"
   flush
   pushCom "Si esta desigualdad se sigue inmediatamente de una hipótesis, se puede usar:"
