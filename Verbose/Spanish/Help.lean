@@ -106,7 +106,7 @@ implement_endpoint (lang := es) helpImplicationSuggestion (hyp HN H'N : Name) (c
   else do
     pushCom "La premisa de esta implicación es {← le.fmt}"
     pushCom "Si se tiene una demostración {HN} de {← le.fmt}"
-    pushCom "Puedes usar esta hipótesis con:"
+    pushCom "Se puede usar esta hipótesis con:"
     pushTac `(tactic|Por $hyp.ident:term aplicado a $HN.ident:term tenemos $H'N.ident:ident : $(← re.stx):term)
     pushComment <| libre H'N.ident
 
@@ -123,7 +123,7 @@ implement_endpoint (lang := es) helpSinceImplicationSuggestion (stmt goalS leS :
   else do
     pushCom "La premisa de esta implicación es {← le.fmt}"
     pushCom "Si se tiene una demostración de {← le.fmt}"
-    pushCom "Puedes usar esta hipótesis con:"
+    pushCom "Se puede usar esta hipótesis con:"
     pushTac `(tactic|Como $stmt:term ,y $leS:term tenemos que $(← re.stx):term)
 
 implement_endpoint (lang := es) helpEquivalenceSuggestion (hyp hyp'N : Name) (l r : Expr) : SuggestionM Unit := do
