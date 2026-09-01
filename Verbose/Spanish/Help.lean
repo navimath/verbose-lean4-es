@@ -260,7 +260,7 @@ implement_endpoint (lang := es) helpSubsetSuggestion (hyp x hx hx' : Name)
   pushCom "La hipótesis {hyp} afirma la inclusión de {l} en {← r.fmt}."
   pushCom "Se puede usar con:"
   pushTac `(tactic| Por $hyp.ident:ident aplicado a $x.ident usando $hx.ident tenemos $hx'.ident:ident : $x.ident ∈ $(← r.stx))
-  pushCom "donde {x} es {describe ambientTypePP} y {hx} demuestra que {x} ∈ {l}."
+  pushCom "donde {x} es {describe ambientTypePP} y {hx} demuestra que {x} ∈ {l}"
   pushComment <| libre hx'.ident
 
 implement_endpoint (lang := es) helpSinceSubsetSuggestion (hyp x : Name) (stmt new : Term)
@@ -651,7 +651,7 @@ implement_endpoint (lang := es) helpByContradictionNLSuggestion (assum : Term) :
 open Verbose.Named in
 implement_endpoint (lang := es) helpNegationGoalSuggestion (hyp : Ident) (p : Format) (assum : Term) :
     SuggestionM Unit := do
-  pushCom "El objetivo es la negación de {p}, es decir, {p} implica una contradicción"
+  pushCom "El objetivo es la negación de {p}, es decir, {p} implica una contradicción."
   pushCom "Luego una demostración directa empieza con:"
   pushTac `(tactic| Supongamos $hyp:ident : $assum)
   pushCom "Por tanto solo queda demostrar una contradicción."
@@ -659,7 +659,7 @@ implement_endpoint (lang := es) helpNegationGoalSuggestion (hyp : Ident) (p : Fo
 open Verbose.NameLess in
 implement_endpoint (lang := es) helpNegationNLGoalSuggestion (p : Format) (assum : Term) :
     SuggestionM Unit := do
-  pushCom "El objetivo es la negación de {p}, es decir, {p} implica una contradicción"
+  pushCom "El objetivo es la negación de {p}, es decir, {p} implica una contradicción."
   pushCom "Luego una demostración directa empieza con:"
   pushTac `(tactic| Supongamos que $assum)
   pushCom "Por tanto solo queda demostrar una contradicción."
@@ -667,7 +667,7 @@ implement_endpoint (lang := es) helpNegationNLGoalSuggestion (p : Format) (assum
 open Verbose.Named in
 implement_endpoint (lang := es) helpNeGoalSuggestion (l r : Format) (lS rS : Term) (Hyp : Ident):
     SuggestionM Unit := do
-  pushCom "El objetivo es la negación de {l} = {r}, es decir, {l} = {r} implica una contradicción"
+  pushCom "El objetivo es la negación de {l} = {r}, es decir, {l} = {r} implica una contradicción."
   pushCom "Luego una demostración directa empieza con:"
   pushTac `(tactic| Supongamos $Hyp:ident : $lS = $rS)
   pushCom "Por tanto solo queda demostrar una contradicción."
@@ -675,7 +675,7 @@ implement_endpoint (lang := es) helpNeGoalSuggestion (l r : Format) (lS rS : Ter
 open Verbose.NameLess in
 implement_endpoint (lang := es) helpNeGoalNLSuggestion (l r : Format) (lS rS : Term) :
     SuggestionM Unit := do
-  pushCom "El objetivo es la negación de {l} = {r}, es decir, {l} = {r} implica una contradicción"
+  pushCom "El objetivo es la negación de {l} = {r}, es decir, {l} = {r} implica una contradicción."
   pushCom "Luego una demostración directa empieza con:"
   pushTac `(tactic| Supongamos que $lS = $rS)
   pushCom "Por tanto solo queda demostrar una contradicción."
