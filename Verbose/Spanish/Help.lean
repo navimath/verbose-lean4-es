@@ -241,7 +241,7 @@ implement_endpoint (lang := es) helpSinceMemUnionSuggestion (elemS leS reS : Ter
   pushTac `(tactic|Distinguimos en casos según si $elemS ∈ $leS o $elemS ∈ $reS)
 
 implement_endpoint (lang := es) helpGenericMemSuggestion (hyp : Name) : SuggestionM Unit := do
-  pushCom "La hipótesis {hyp} es una relación de pertenencia."
+  pushCom "La hipótesis {hyp} es una relación de pertenencia"
 
 implement_endpoint (lang := es) helpContradictionSuggestion (hypId : Ident) : SuggestionM Unit := do
   pushComment <| "Esta hipótesis es una contradicción."
