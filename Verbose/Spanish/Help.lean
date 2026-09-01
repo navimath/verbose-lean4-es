@@ -190,7 +190,7 @@ implement_endpoint (lang := es) helpSinceEqualSuggestion (hyp : Name)
     flush
     pushCom "Estas sustituciones también se pueden aplicar en una afirmación que se derive de alguna de las hipótesis actuales con:"
     pushTac `(tactic|Como $eq:term ,y ?_ tenemos que ?_)
-    pushCom "sustituyendo el primer signo de interrogación por el dato que quieras sustituir, y el segundo por el nuevo dato obtenido."
+    pushCom "reemplazando el primer signo de interrogación por la información que quieras sustituir, y el segundo por el nuevo dato obtenido."
 
 implement_endpoint (lang := es) helpIneqSuggestion (hyp : Name) (closes : Bool) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es una desigualdad"
