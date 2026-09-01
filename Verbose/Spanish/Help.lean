@@ -517,7 +517,7 @@ implement_endpoint (lang := es) helpEquivalenceGoalSuggestion (mpF mrF : Format)
   pushTac `(tactic|Primero probemos que $mpS)
   pushCom "Una vez demostrada esta primera afirmación, quedará por demostrar que {mrF}"
   flush
-  pushCom "También se puede empezar por:"
+  pushCom "También se puede empezar con:"
   pushTac `(tactic|Primero probemos que $mrS)
   pushCom "Entonces, una vez terminada esta primera demostración, quedará por demostrar que {mpF}"
 
