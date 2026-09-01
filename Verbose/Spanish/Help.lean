@@ -306,7 +306,7 @@ implement_endpoint (lang := es) helpForAllRelExistsSimpleSuggestion (hyp n' hn' 
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
   pushTac `(tactic|Por $hyp.ident:term aplicado a $n₀.ident usando $hn₀.ident tenemos $n'.ident:ident tal que ($hn'.ident : $p'S))
-  pushCom "donde {n₀} es {describe t} y {hn₀} una demostración de {n₀rel}"
+  pushCom "donde {n₀} es {describe t} y {hn₀} es una demostración de {n₀rel}"
   pushComment <| libres [n'.ident, hn'.ident]
 
 implement_endpoint (lang := es) helpSinceForAllRelExistsSimpleSuggestion (stmt : Term)
@@ -323,7 +323,7 @@ implement_endpoint (lang := es) helpForAllRelGenericSuggestion (hyp n₀ hn₀ :
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
   pushTac `(tactic|Por $hyp.ident:term aplicado a $n₀.ident usando $hn₀.ident tenemos ($newsI : $pS))
-  pushCom "donde {n₀} es {describe t} y {hn₀} una demostración de {n₀rel}"
+  pushCom "donde {n₀} es {describe t} y {hn₀} es una demostración de {n₀rel}"
   pushComment <| libre newsI
 
 implement_endpoint (lang := es) helpSinceForAllRelGenericSuggestion (stmt : Term) (hyp n₀ : Name)
@@ -373,7 +373,7 @@ implement_endpoint (lang := es) helpForAllSimpleForAllRelSuggestion (hyp nn₀ v
   pushCom "La hipótesis {hyp} empieza con “{headDescr}"
   pushCom "Se puede usar con:"
   pushTac `(tactic|Por $hyp.ident:term aplicado a $nn₀.ident ,y $var_name'₀.ident usando $H.ident tenemos ($h.ident : $p'S))
-  pushCom "donde {nn₀} y {var_name'₀} son {describe_pl t} y {H} una demostración de {rel₀}"
+  pushCom "donde {nn₀} y {var_name'₀} son {describe_pl t} y {H} es una demostración de {rel₀}"
   pushComment <| libre h.ident
 
 implement_endpoint (lang := es) helpSinceForAllSimpleForAllRelSuggestion (stmt rel₀S : Term) (hyp nn₀ var_name'₀ : Name)
