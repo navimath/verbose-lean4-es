@@ -58,14 +58,14 @@ implement_endpoint (lang := es) helpExistRelSuggestion (hyp : Name) (headDescr :
     (nameS ineqIdent hS : Ident) (ineqS pS : Term) : SuggestionM Unit := do
   describeHypShape hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Por $hyp.ident:term tenemos $nameS:ident tal que ($ineqIdent : $ineqS) ,y ($hS : $pS))
+  pushTac `(tactic|Por $hyp.ident:term tenemos $nameS:ident tal que ($ineqIdent : $ineqS) y ($hS : $pS))
   pushComment <| libres [nameS, ineqIdent, hS]
 
 implement_endpoint (lang := es) helpSinceExistRelSuggestion (hyp : Name) (headDescr : String)
     (nameS ineqIdent hS : Ident) (hypS ineqS pS : Term) : SuggestionM Unit := do
   describeHypShape hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $hypS:term elegimos $nameS:ident tal que ($ineqIdent : $ineqS) ,y ($hS : $pS))
+  pushTac `(tactic|Como $hypS:term elegimos $nameS:ident tal que ($ineqIdent : $ineqS) y ($hS : $pS))
   pushComment <| libres [nameS, ineqIdent, hS]
 
 implement_endpoint (lang := es) helpConjunctionSuggestion (hyp : Name) (h₁I h₂I : Ident) (p₁S p₂S : Term) :
@@ -81,7 +81,7 @@ implement_endpoint (lang := es) helpSinceConjunctionSuggestion (hyp : Name) (p�
   let headDescr := "... y ..."
   describeHypShape hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $p₁S:term ∧ $p₂S se tiene que $p₁S:term ,y $p₂S)
+  pushTac `(tactic|Como $p₁S:term ∧ $p₂S se tiene que $p₁S:term y $p₂S)
 
 implement_endpoint (lang := es) helpDisjunctionSuggestion (hyp : Name) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es de la forma « ... o ... »"
@@ -119,12 +119,12 @@ implement_endpoint (lang := es) helpSinceImplicationSuggestion (stmt goalS leS :
     pushTac `(tactic| Como $stmt:term basta probar que $(← le.stx):term)
     flush
     pushCom "Si ya se tiene una demostración de {← le.fmt}, puedes usar:"
-    pushTac `(tactic|Como $stmt:term ,y $(← le.stx):term concluimos que $goalS)
+    pushTac `(tactic|Como $stmt:term y $(← le.stx):term concluimos que $goalS)
   else do
     pushCom "La premisa de esta implicación es {← le.fmt}"
     pushCom "Si se tiene una demostración de {← le.fmt}"
     pushCom "Se puede usar esta hipótesis con:"
-    pushTac `(tactic|Como $stmt:term ,y $leS:term tenemos que $(← re.stx):term)
+    pushTac `(tactic|Como $stmt:term y $leS:term tenemos que $(← re.stx):term)
 
 implement_endpoint (lang := es) helpEquivalenceSuggestion (hyp hyp'N : Name) (l r : Expr) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} es una equivalencia"
@@ -148,7 +148,7 @@ implement_endpoint (lang := es) helpSinceEquivalenceSuggestion
   pushCom "reemplazando el signo de interrogación por el nuevo objetivo."
   flush
   pushCom "Estas sustituciones también se pueden aplicar en una afirmación que se derive de alguna de las hipótesis actuales con:"
-  pushTac `(tactic|Como $stmt:term ,y ?_ tenemos que ?_)
+  pushTac `(tactic|Como $stmt:term y ?_ tenemos que ?_)
   pushCom "reemplazando el primer signo de interrogación por la información que quieras sustituir, y el segundo por el nuevo dato obtenido."
 
 implement_endpoint (lang := es) helpEqualSuggestion (hyp hyp' : Name) (closes : Bool) (l r : String) :
@@ -189,7 +189,7 @@ implement_endpoint (lang := es) helpSinceEqualSuggestion (hyp : Name)
     pushCom "reemplazando el signo de interrogación por el nuevo objetivo."
     flush
     pushCom "Estas sustituciones también se pueden aplicar en una afirmación que se derive de alguna de las hipótesis actuales con:"
-    pushTac `(tactic|Como $eq:term ,y ?_ tenemos que ?_)
+    pushTac `(tactic|Como $eq:term y ?_ tenemos que ?_)
     pushCom "reemplazando el primer signo de interrogación por la información que quieras sustituir, y el segundo por el nuevo dato obtenido."
 
 implement_endpoint (lang := es) helpIneqSuggestion (hyp : Name) (closes : Bool) : SuggestionM Unit := do
@@ -212,7 +212,7 @@ implement_endpoint (lang := es) helpSinceIneqSuggestion (hyp : Name) (stmt goal 
   else do
     flush
     pushCom "También puede usarse en algún paso de cálculo, o combinarse linealmente con otras usando:"
-    pushTac `(tactic| Como $stmt:term ,y ?_ concluimos que  $goal)
+    pushTac `(tactic| Como $stmt:term y ?_ concluimos que  $goal)
     pushCom "sustituyendo el signo de interrogación por uno o varios términos que demuestren igualdades o desigualdades."
 
 implement_endpoint (lang := es) helpMemInterSuggestion (hyp h₁ h₂ : Name) (elemS p₁S p₂S : Term) :
@@ -226,7 +226,7 @@ implement_endpoint (lang := es) helpSinceMemInterSuggestion (stmt : Term) (hyp :
     SuggestionM Unit := do
   pushCom "La hipótesis {hyp} afirma pertenencia a una intersección"
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $stmt:term tenemos que $mem₁:term ,y $mem₂)
+  pushTac `(tactic|Como $stmt:term tenemos que $mem₁:term y $mem₂)
 
 implement_endpoint (lang := es) helpMemUnionSuggestion (hyp : Name) :
     SuggestionM Unit := do
@@ -267,7 +267,7 @@ implement_endpoint (lang := es) helpSinceSubsetSuggestion (hyp x : Name) (stmt n
     (l r : Expr) (ambientTypePP : Format) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} afirma la inclusión de {← l.fmt} en {← r.fmt}."
   pushCom "Se puede usar con:"
-  pushTac `(tactic| Como $stmt:term ,y $x.ident ∈ $(← l.stx) tenemos que $new:term)
+  pushTac `(tactic| Como $stmt:term y $x.ident ∈ $(← l.stx) tenemos que $new:term)
   pushCom "donde {x} es {describe ambientTypePP}"
 
 implement_endpoint (lang := es) assumptionClosesSuggestion (hypId : Ident) : SuggestionM Unit := do
@@ -287,7 +287,7 @@ implement_endpoint (lang := es) helpForAllRelExistsRelSuggestion (hyp var_name' 
     SuggestionM Unit := do
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Por $hyp.ident:term aplicado a $n₀.ident usando $hn₀.ident tenemos $var_name'.ident:ident tal que ($ineqIdent : $ineqS) ,y ($hn'S : $p'S))
+  pushTac `(tactic|Por $hyp.ident:term aplicado a $n₀.ident usando $hn₀.ident tenemos $var_name'.ident:ident tal que ($ineqIdent : $ineqS) y ($hn'S : $p'S))
   pushCom "donde {n₀} es {describe t} y {hn₀} es una demostración de {hypDescr}."
   pushComment <| libres [var_name'.ident, ineqIdent, hn'S]
 
@@ -297,7 +297,7 @@ implement_endpoint (lang := es) helpSinceForAllRelExistsRelSuggestion (stmt :
     SuggestionM Unit := do
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $stmt:term ,y $stmtn₀ obtenemos $var_name'.ident:ident tal que $ineqS ,y $p'S)
+  pushTac `(tactic|Como $stmt:term y $stmtn₀ obtenemos $var_name'.ident:ident tal que $ineqS y $p'S)
   pushCom "donde {n₀} es {describe t} y la relación {stmtn₀Str} se sigue inmediatamente de alguna hipótesis."
   pushComment <| libre var_name'.ident
 
@@ -314,7 +314,7 @@ implement_endpoint (lang := es) helpSinceForAllRelExistsSimpleSuggestion (stmt :
   (stmtn₀ : Term) (stmtn₀Str headDescr : String) (t : Format) (p'S : Term) : SuggestionM Unit := do
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $stmt:term ,y $stmtn₀ obtenemos $n'.ident:ident tal que $p'S)
+  pushTac `(tactic|Como $stmt:term y $stmtn₀ obtenemos $n'.ident:ident tal que $p'S)
   pushCom "donde {n₀} es {describe t} y la relación {stmtn₀Str} se sigue inmediatamente de alguna hipótesis."
   pushComment <| libre n'.ident
 
@@ -331,7 +331,7 @@ implement_endpoint (lang := es) helpSinceForAllRelGenericSuggestion (stmt : Term
   (stmtn₀Str headDescr : String) (t : Format) (pS : Term) : SuggestionM Unit := do
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $stmt:term ,y $stmtn₀ tenemos que $pS:term)
+  pushTac `(tactic|Como $stmt:term y $stmtn₀ tenemos que $pS:term)
   pushCom "donde {n₀} es {describe t} y {stmtn₀Str} se sigue inmediatamente de alguna hipótesis."
 
 implement_endpoint (lang := es) helpForAllSimpleExistsRelSuggestion (hyp var_name' nn₀ : Name)
@@ -339,7 +339,7 @@ implement_endpoint (lang := es) helpForAllSimpleExistsRelSuggestion (hyp var_nam
     SuggestionM Unit := do
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Por $hyp.ident:term aplicado a $nn₀.ident tenemos $var_name'.ident:ident tal que ($ineqIdent : $ineqS) ,y ($hn'S : $p'S))
+  pushTac `(tactic|Por $hyp.ident:term aplicado a $nn₀.ident tenemos $var_name'.ident:ident tal que ($ineqIdent : $ineqS) y ($hn'S : $p'S))
   pushCom "donde {nn₀} es {describe t}"
   pushComment <| libres [var_name'.ident, ineqIdent, hn'S]
 
@@ -348,7 +348,7 @@ implement_endpoint (lang := es) helpSinceForAllSimpleExistsRelSuggestion (stmt :
     SuggestionM Unit := do
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $stmt:term obtenemos $var_name'.ident:ident tal que $ineqS ,y $p'S)
+  pushTac `(tactic|Como $stmt:term obtenemos $var_name'.ident:ident tal que $ineqS y $p'S)
   pushCom "donde {nn₀} es {describe t}"
   pushComment <| libre var_name'.ident
 
@@ -372,7 +372,7 @@ implement_endpoint (lang := es) helpForAllSimpleForAllRelSuggestion (hyp nn₀ v
     (headDescr rel₀ : String) (t : Format) (p'S : Term) : SuggestionM Unit := do
   pushCom "La hipótesis {hyp} empieza con “{headDescr}"
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Por $hyp.ident:term aplicado a $nn₀.ident ,y $var_name'₀.ident usando $H.ident tenemos ($h.ident : $p'S))
+  pushTac `(tactic|Por $hyp.ident:term aplicado a $nn₀.ident y $var_name'₀.ident usando $H.ident tenemos ($h.ident : $p'S))
   pushCom "donde {nn₀} y {var_name'₀} son {describe_pl t} y {H} es una demostración de {rel₀}"
   pushComment <| libre h.ident
 
@@ -380,7 +380,7 @@ implement_endpoint (lang := es) helpSinceForAllSimpleForAllRelSuggestion (stmt r
     (headDescr rel₀ : String) (t : Format) (p'S : Term) : SuggestionM Unit := do
   describeHypStart hyp headDescr
   pushCom "Se puede usar con:"
-  pushTac `(tactic|Como $stmt:term ,y $rel₀S:term tenemos que $p'S:term)
+  pushTac `(tactic|Como $stmt:term y $rel₀S:term tenemos que $p'S:term)
   pushCom "donde {nn₀} y {var_name'₀} son {describe_pl t} y {rel₀} se sigue inmediatamente de alguna hipótesis."
 
 implement_endpoint (lang := es) helpForAllSimpleGenericSuggestion (hyp nn₀ hn₀ : Name) (headDescr : String)
@@ -620,7 +620,7 @@ implement_endpoint (lang := es) helpSinceFalseGoalSuggestion (goal : Term) : Sug
   pushCom "Se puede aplicar una hipótesis que sea una negación"
   pushCom "es decir, una hipótesis de la forma P → falso."
   pushCom "También se pueden combinar dos hechos que claramente se contradigan usando:"
-  pushTac `(tactic|Como ?_ ,y ?_ concluimos que  $goal)
+  pushTac `(tactic|Como ?_ y ?_ concluimos que  $goal)
   pushCom "sustituyendo los signos de interrogación por esos dos hechos que se deducen inmediatamente de las hipótesis."
   flush
   pushCom "También se puede invocar un hecho claramente falso (como `0 = 1`) que se deduce inmediatamente de una hipótesis."
@@ -708,7 +708,7 @@ example {P : ℕ → Prop} (h : ∀ n > 0, P n) : P 2 := by
 info: Ayuda
   • La hipótesis h es de la forma “∃ n > 0, ...”
     Se puede usar con:
-    Por h tenemos n tal que (n_pos : n > 0) ,y (hn : P n)
+    Por h tenemos n tal que (n_pos : n > 0) y (hn : P n)
     Los nombres n, n_pos y hn pueden ser escogidos libremente entre los nombres disponibles.
 -/
 #guard_msgs in
@@ -720,7 +720,7 @@ example {P : ℕ → Prop} (h : ∃ n > 0, P n) : True := by
 info: Ayuda
   • La hipótesis h es de la forma “∃ ε > 0, ...”
     Se puede usar con:
-    Por h tenemos ε tal que (ε_pos : ε > 0) ,y (hε : P ε)
+    Por h tenemos ε tal que (ε_pos : ε > 0) y (hε : P ε)
     Los nombres ε, ε_pos y hε pueden ser escogidos libremente entre los nombres disponibles.
 -/
 #guard_msgs in
@@ -897,7 +897,7 @@ info: Ayuda
   • La hipótesis h empieza con “∀ k ≥ 2, ∃ n ≥ 3, ...”
     Se puede usar con:
     Por h aplicado a k₀ usando hk₀ tenemos
-        n tal que (n_sup : n ≥ 3) ,y (hn : ∀ (l : ℕ), l - n = 0 → P l k₀)
+        n tal que (n_sup : n ≥ 3) y (hn : ∀ (l : ℕ), l - n = 0 → P l k₀)
     donde k₀ es un número natural y hk₀ es una demostración de k₀ ≥ 2.
     Los nombres n, n_sup y hn pueden ser escogidos libremente entre los nombres disponibles.
 -/
@@ -910,7 +910,7 @@ example (P : ℕ → ℕ → Prop) (h : ∀ k ≥ 2, ∃ n ≥ 3, ∀ l, l - n =
 info: Ayuda
   • La hipótesis h empieza con “∀ k n, k ≥ n ⇒ ...
     Se puede usar con:
-    Por h aplicado a k₀ ,y n₀ usando H tenemos (h_1 : ∀ (l : ℕ), l - n₀ = 0 → P l k₀)
+    Por h aplicado a k₀ y n₀ usando H tenemos (h_1 : ∀ (l : ℕ), l - n₀ = 0 → P l k₀)
     donde k₀ y n₀ son números naturales y H es una demostración de k₀ ≥ n₀
     El nombre h_1 puede ser escogido libremente entre los nombres disponibles.
 -/
@@ -924,7 +924,7 @@ info: Ayuda
   • La hipótesis h empieza con “∀ k ≥ 2, ∃ n_1 ≥ 3, ...”
     Se puede usar con:
     Por h aplicado a k₀ usando hk₀ tenemos
-        n_1 tal que (n_1_sup : n_1 ≥ 3) ,y (hn_1 : ∀ (l : ℕ), l - n = 0 → P l k₀)
+        n_1 tal que (n_1_sup : n_1 ≥ 3) y (hn_1 : ∀ (l : ℕ), l - n = 0 → P l k₀)
     donde k₀ es un número natural y hk₀ es una demostración de k₀ ≥ 2.
     Los nombres n_1, n_1_sup y hn_1 pueden ser escogidos libremente entre los nombres disponibles.
 -/
@@ -937,7 +937,7 @@ example (P : ℕ → ℕ → Prop) (n : ℕ) (h : ∀ k ≥ 2, ∃ n ≥ 3, ∀ 
 info: Ayuda
   • La hipótesis h es de la forma “∃ n ≥ 5, ...”
     Se puede usar con:
-    Por h tenemos n tal que (n_sup : n ≥ 5) ,y (hn : P n)
+    Por h tenemos n tal que (n_sup : n ≥ 5) y (hn : P n)
     Los nombres n, n_sup y hn pueden ser escogidos libremente entre los nombres disponibles.
 -/
 #guard_msgs in
@@ -949,7 +949,7 @@ example (P : ℕ → Prop) (h : ∃ n ≥ 5, P n) : True := by
 info: Ayuda
   • La hipótesis h empieza con “∀ k ≥ 2, ∃ n ≥ 3, ...”
     Se puede usar con:
-    Por h aplicado a k₀ usando hk₀ tenemos n tal que (n_sup : n ≥ 3) ,y (hn : P n k₀)
+    Por h aplicado a k₀ usando hk₀ tenemos n tal que (n_sup : n ≥ 3) y (hn : P n k₀)
     donde k₀ es un número natural y hk₀ es una demostración de k₀ ≥ 2.
     Los nombres n, n_sup y hn pueden ser escogidos libremente entre los nombres disponibles.
 -/
@@ -1238,7 +1238,7 @@ example {X Y} (f : X → Y) (x : X) (y : Y) (h : ∃ x, f x = y) : True := by
 info: Ayuda
   • La hipótesis h es de la forma “∃ x ∈ s, ...”
     Se puede usar con:
-    Por h tenemos x_1 tal que (x_1_dans : x_1 ∈ s) ,y (hx_1 : f x_1 = y)
+    Por h tenemos x_1 tal que (x_1_dans : x_1 ∈ s) y (hx_1 : f x_1 = y)
     Los nombres x_1, x_1_dans y hx_1 pueden ser escogidos libremente entre los nombres disponibles.
 -/
 #guard_msgs in
@@ -1305,7 +1305,7 @@ configureHelpProviders SinceHypHelp SinceGoalHelp helpShowContrapositiveGoal
 info: Ayuda
   • La hipótesis h empieza con “∀ n > 0, ...”
     Se puede usar con:
-    Como ∀ n > 0, P n ,y n₀ > 0 tenemos que P n₀
+    Como ∀ n > 0, P n y n₀ > 0 tenemos que P n₀
     donde n₀ es un número natural y n₀ > 0 se sigue inmediatamente de alguna hipótesis.
 -/
 #guard_msgs in
@@ -1318,7 +1318,7 @@ example {P : ℕ → Prop} (h : ∀ n > 0, P n) : P 2 := by
 info: Ayuda
   • La hipótesis h es de la forma “∃ n > 0, ...”
     Se puede usar con:
-    Como ∃ n > 0, P n elegimos n tal que (n_pos : n > 0) ,y (hn : P n)
+    Como ∃ n > 0, P n elegimos n tal que (n_pos : n > 0) y (hn : P n)
     Los nombres n, n_pos y hn pueden ser escogidos libremente entre los nombres disponibles.
 -/
 #guard_msgs in
@@ -1330,7 +1330,7 @@ example {P : ℕ → Prop} (h : ∃ n > 0, P n) : True := by
 info: Ayuda
   • La hipótesis h es de la forma “∃ ε > 0, ...”
     Se puede usar con:
-    Como ∃ ε > 0, P ε elegimos ε tal que (ε_pos : ε > 0) ,y (hε : P ε)
+    Como ∃ ε > 0, P ε elegimos ε tal que (ε_pos : ε > 0) y (hε : P ε)
     Los nombres ε, ε_pos y hε pueden ser escogidos libremente entre los nombres disponibles.
 -/
 #guard_msgs in
@@ -1373,7 +1373,7 @@ info: Ayuda
     Entonces, se puede usar esta hipótesis con:
     Como P 1 → Q 2 basta probar que P 1
   • Si ya se tiene una demostración de P 1, puedes usar:
-    Como P 1 → Q 2 ,y P 1 concluimos que Q 2
+    Como P 1 → Q 2 y P 1 concluimos que Q 2
 -/
 #guard_msgs in
 example (P Q : ℕ → Prop) (h : P 1 → Q 2) (h' : P 1) : Q 2 := by
@@ -1386,7 +1386,7 @@ info: Ayuda
     La premisa de esta implicación es P 1
     Si se tiene una demostración de P 1
     Se puede usar esta hipótesis con:
-    Como P 1 → Q 2 ,y P 1 tenemos que Q 2
+    Como P 1 → Q 2 y P 1 tenemos que Q 2
 -/
 #guard_msgs in
 example (P Q : ℕ → Prop) (h : P 1 → Q 2) : True := by
@@ -1397,7 +1397,7 @@ example (P Q : ℕ → Prop) (h : P 1 → Q 2) : True := by
 info: Ayuda
   • La hipótesis h es de la forma “... y ...”
     Se puede usar con:
-    Como P 1 ∧ Q 2 se tiene que P 1 ,y Q 2
+    Como P 1 ∧ Q 2 se tiene que P 1 y Q 2
 -/
 #guard_msgs in
 example (P Q : ℕ → Prop) (h : P 1 ∧ Q 2) : True := by
@@ -1411,7 +1411,7 @@ info: Ayuda
     Como (∀ n ≥ 2, P n) ↔ ∀ (l : ℕ), Q l basta probar que ?_
     reemplazando el signo de interrogación por el nuevo objetivo.
   • Estas sustituciones también se pueden aplicar en una afirmación que se derive de alguna de las hipótesis actuales con:
-    Como (∀ n ≥ 2, P n) ↔ ∀ (l : ℕ), Q l ,y ?_ tenemos que ?_
+    Como (∀ n ≥ 2, P n) ↔ ∀ (l : ℕ), Q l y ?_ tenemos que ?_
     reemplazando el primer signo de interrogación por la información que quieras sustituir, y el segundo por el nuevo dato obtenido.
 -/
 #guard_msgs in
@@ -1437,7 +1437,7 @@ example (f : ℝ → ℝ) (h : ∀ x y, x ≤ y → f x ≤ f y) (a b : ℝ) (h'
 info: Ayuda
   • La hipótesis h empieza con “∀ x > 0, ...”
     Se puede usar con:
-    Como ∀ x > 0, x = 1 → f x ≤ 0 ,y x₀ > 0 tenemos que x₀ = 1 → f x₀ ≤ 0
+    Como ∀ x > 0, x = 1 → f x ≤ 0 y x₀ > 0 tenemos que x₀ = 1 → f x₀ ≤ 0
     donde x₀ es un número real y x₀ > 0 se sigue inmediatamente de alguna hipótesis.
 -/
 #guard_msgs in
@@ -1451,7 +1451,7 @@ info: Ayuda
     La premisa de esta implicación es l - n = 0
     Si se tiene una demostración de l - n = 0
     Se puede usar esta hipótesis con:
-    Como l - n = 0 → P l k ,y l - n = 0 tenemos que P l k
+    Como l - n = 0 → P l k y l - n = 0 tenemos que P l k
 -/
 #guard_msgs in
 example (P : ℕ → ℕ → Prop) (k l n : ℕ) (h : l - n = 0 → P l k) : True := by
@@ -1462,8 +1462,8 @@ example (P : ℕ → ℕ → Prop) (k l n : ℕ) (h : l - n = 0 → P l k) : Tru
 info: Ayuda
   • La hipótesis h empieza con “∀ k ≥ 2, ∃ n ≥ 3, ...”
     Se puede usar con:
-    Como ∀ k ≥ 2, ∃ n ≥ 3, ∀ (l : ℕ), l - n = 0 → P l k ,y k₀ ≥ 2 obtenemos
-        n tal que n ≥ 3 ,y ∀ (l : ℕ), l - n = 0 → P l k₀
+    Como ∀ k ≥ 2, ∃ n ≥ 3, ∀ (l : ℕ), l - n = 0 → P l k y k₀ ≥ 2 obtenemos
+        n tal que n ≥ 3 y ∀ (l : ℕ), l - n = 0 → P l k₀
     donde k₀ es un número natural y la relación k₀ ≥ 2 se sigue inmediatamente de alguna hipótesis.
     El nombre n puede ser escogido libremente entre los nombres disponibles.
 -/
@@ -1477,7 +1477,7 @@ example (P : ℕ → ℕ → Prop) (h : ∀ k ≥ 2, ∃ n ≥ 3, ∀ l, l - n =
 info: Ayuda
   • La hipótesis h empieza con “∀ k n, k ≥ n ⇒ ...”
     Se puede usar con:
-    Como ∀ (k n : ℕ), n ≥ 3 → ∀ (l : ℕ), l - n = 0 → P l k ,y n ≥ 3 tenemos que
+    Como ∀ (k n : ℕ), n ≥ 3 → ∀ (l : ℕ), l - n = 0 → P l k y n ≥ 3 tenemos que
         ∀ (l : ℕ), l - n₀ = 0 → P l k₀
     donde k₀ y n₀ son números naturales y k₀ ≥ n₀ se sigue inmediatamente de alguna hipótesis.
 -/
@@ -1491,7 +1491,7 @@ example (P : ℕ → ℕ → Prop) (h : ∀ k, ∀ n ≥ 3, ∀ l, l - n = 0 →
 info: Ayuda
   • La hipótesis h empieza con “∀ k n, k ≤ n ⇒ ...”
     Se puede usar con:
-    Como ∀ (k n : ℕ), n ≤ k → f n ≤ f k ,y n ≤ k tenemos que f n₀ ≤ f k₀
+    Como ∀ (k n : ℕ), n ≤ k → f n ≤ f k y n ≤ k tenemos que f n₀ ≤ f k₀
     donde k₀ y n₀ son números naturales y k₀ ≤ n₀ se sigue inmediatamente de alguna hipótesis.
 -/
 #guard_msgs in
@@ -1505,22 +1505,22 @@ example (f : ℕ → ℕ) (h : ∀ k n, n ≤ k → f n ≤ f k) : True := by
 info: Ayuda
   • La hipótesis h empieza con “∀ k ≥ 2, ∃ n_1 ≥ 3, ...”
     Se puede usar con:
-    Como ∀ k ≥ 2, ∃ n ≥ 3, ∀ (l : ℕ), l - n = 0 → P l k ,y k₀ ≥ 2 obtenemos
-        n_1 tal que n_1 ≥ 3 ,y ∀ (l : ℕ), l - n = 0 → P l k₀
+    Como ∀ k ≥ 2, ∃ n ≥ 3, ∀ (l : ℕ), l - n = 0 → P l k y k₀ ≥ 2 obtenemos
+        n_1 tal que n_1 ≥ 3 y ∀ (l : ℕ), l - n = 0 → P l k₀
     donde k₀ es un número natural y la relación k₀ ≥ 2 se sigue inmediatamente de alguna hipótesis.
     El nombre n_1 puede ser escogido libremente entre los nombres disponibles.
 -/
 #guard_msgs in
 example (P : ℕ → ℕ → Prop) (n : ℕ) (h : ∀ k ≥ 2, ∃ n ≥ 3, ∀ l, l - n = 0 → P l k) : True := by
   ayuda h
-  Por h aplicado a 2 usando le_rfl tenemos n' tal que (n_sup : n' ≥ 3) ,y (hn : ∀ (l : ℕ), l - n' = 0 → P l 2)
+  Por h aplicado a 2 usando le_rfl tenemos n' tal que (n_sup : n' ≥ 3) y (hn : ∀ (l : ℕ), l - n' = 0 → P l 2)
   trivial
 
 /--
 info: Ayuda
   • La hipótesis h es de la forma “∃ n ≥ 5, ...”
     Se puede usar con:
-    Como ∃ n ≥ 5, P n elegimos n tal que (n_sup : n ≥ 5) ,y (hn : P n)
+    Como ∃ n ≥ 5, P n elegimos n tal que (n_sup : n ≥ 5) y (hn : P n)
     Los nombres n, n_sup y hn pueden ser escogidos libremente entre los nombres disponibles.
 -/
 #guard_msgs in
@@ -1532,7 +1532,7 @@ example (P : ℕ → Prop) (h : ∃ n ≥ 5, P n) : True := by
 info: Ayuda
   • La hipótesis h empieza con “∀ k ≥ 2, ∃ n ≥ 3, ...”
     Se puede usar con:
-    Como ∀ k ≥ 2, ∃ n ≥ 3, P n k ,y k₀ ≥ 2 obtenemos n tal que n ≥ 3 ,y P n k₀
+    Como ∀ k ≥ 2, ∃ n ≥ 3, P n k y k₀ ≥ 2 obtenemos n tal que n ≥ 3 y P n k₀
     donde k₀ es un número natural y la relación k₀ ≥ 2 se sigue inmediatamente de alguna hipótesis.
     El nombre n puede ser escogido libremente entre los nombres disponibles.
 -/
@@ -1581,7 +1581,7 @@ example (P Q : ℕ → Prop) (h : P 1 ∨ Q 2) : True := by
 info: Ayuda
   • La hipótesis h afirma pertenencia a una intersección
     Se puede usar con:
-    Como x ∈ s ∩ t tenemos que x ∈ s ,y x ∈ t
+    Como x ∈ s ∩ t tenemos que x ∈ s y x ∈ t
 -/
 #guard_msgs in
 example (s t : Set ℕ) (x : ℕ) (h : x ∈ s ∩ t) : x ∈ s := by
@@ -1593,7 +1593,7 @@ example (s t : Set ℕ) (x : ℕ) (h : x ∈ s ∩ t) : x ∈ s := by
 info: Ayuda
   • La hipótesis h afirma pertenencia a una intersección
     Se puede usar con:
-    Como x ∈ s ∩ t tenemos que x ∈ s ,y x ∈ t
+    Como x ∈ s ∩ t tenemos que x ∈ s y x ∈ t
 ---
 info: Ayuda
   • El objetivo es demostrar que x pertenece a la intersección de t con otro conjunto.
@@ -1678,7 +1678,7 @@ info: Ayuda
     Como P ↔ Q basta probar que ?_
     reemplazando el signo de interrogación por el nuevo objetivo.
   • Estas sustituciones también se pueden aplicar en una afirmación que se derive de alguna de las hipótesis actuales con:
-    Como P ↔ Q ,y ?_ tenemos que ?_
+    Como P ↔ Q y ?_ tenemos que ?_
     reemplazando el primer signo de interrogación por la información que quieras sustituir, y el segundo por el nuevo dato obtenido.
 -/
 #guard_msgs in
@@ -1691,7 +1691,7 @@ example (P Q : Prop) (h : P ↔ Q) (h' : P) : Q := by
 info: Ayuda
   • La hipótesis h afirma la inclusión de A en B.
     Se puede usar con:
-    Como A ⊆ B ,y x ∈ A tenemos que x ∈ B
+    Como A ⊆ B y x ∈ A tenemos que x ∈ B
     donde x es un número natural
 -/
 #guard_msgs in
@@ -1716,7 +1716,7 @@ info: Ayuda
     Se puede aplicar una hipótesis que sea una negación
     es decir, una hipótesis de la forma P → falso.
     También se pueden combinar dos hechos que claramente se contradigan usando:
-    Como ?_ ,y ?_ concluimos que False
+    Como ?_ y ?_ concluimos que False
     sustituyendo los signos de interrogación por esos dos hechos que se deducen inmediatamente de las hipótesis.
   • También se puede invocar un hecho claramente falso (como `0 = 1`) que se deduce inmediatamente de una hipótesis.
     Como ?_ concluimos que False
