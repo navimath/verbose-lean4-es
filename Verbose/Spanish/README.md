@@ -242,6 +242,12 @@ en un término corriente. Para juntar proposiciones dentro de un hecho se usa `�
 y para una lista de tres, la coma: `Como A, B y C ...`. Detalle en
 `Exceptions.lean`, §1f.
 
+En la práctica esto casi no se nota. El único sitio donde apetecería una `y`
+anidada entre paréntesis es hablando de lógica, juntando proposiciones, y ahí lo
+que se escribe en papel es `∧`, no «y». Así que la forma que Verbose pide es la
+que el estudiante ya usa fuera de Lean. La `y` de Verbose es la de la prosa
+(«como A y B, concluimos...»), no un conectivo lógico; el conectivo es `∧`.
+
 Segunda limitación, de mantenimiento: `canEndTerm`, `canStartTerm` y la lista de
 ligadores son listas escritas a mano. Cada notación nueva de Mathlib o de
 Verbose es un fallo en potencia. No es teórico: al añadir `fun` hubo que añadir
