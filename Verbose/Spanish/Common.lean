@@ -1,4 +1,5 @@
 import Verbose.Tactics.Common
+import Verbose.Spanish.Conjunction
 
 open Lean
 
@@ -6,11 +7,207 @@ namespace Verbose.Spanish
 
 declare_syntax_cat AndES
 
-syntax " ,y " : AndES
-syntax " ,e " : AndES
+syntax ppSpace spanishY ppSpace : AndES
+syntax ppSpace spanishE ppSpace : AndES
+
+/-- ¿Contiene esta sintaxis un corte de conjunción (un nodo `AndES`)? -/
+partial def hasConjSplit (stx : Syntax) : Bool :=
+  if ((toString stx.getKind).splitOn "AndES").length > 1 then true
+  else stx.getArgs.any hasConjSplit
+
+open Lean in
+/-- ¿Es este nodo una conjunción `AndES`? -/
+def isAndESNode (stx : Syntax) : Bool :=
+  ((toString stx.getKind).splitOn "AndES").length > 1
+
+open Lean in
+/-- El primer nodo `AndES` dentro de `stx`, si lo hay. -/
+partial def findAndESNode (stx : Syntax) : Option Syntax :=
+  if isAndESNode stx then some stx
+  else stx.getArgs.findSome? findAndESNode
+
+open Lean in
+/-- La primera conjunción del árbol JUNTO CON el hermano que la precede.
+
+Ese hermano es el primer miembro de la conjunción, y por tanto donde empieza el
+grupo que hay que poner entre paréntesis. Sacarlo del árbol (en vez de recibirlo
+como argumento) es lo que permite envolver CUALQUIER táctica sin saber cómo se
+llama su nodo de hechos. -/
+partial def findConjContext (stx : Syntax) : Option (Syntax × Syntax × Syntax) :=
+  let args := stx.getArgs
+  let rec scan (i : Nat) (prev : Option Syntax) : Option (Syntax × Syntax × Syntax) :=
+    if i < args.size then
+      let a := args[i]!
+      if isAndESNode a then
+        match prev with
+        | some q => some (q, a, stx)
+        | none   => scan (i+1) prev
+      else
+        match findConjContext a with
+        | some r => some r
+        | none   =>
+          let prev' := if a.getRange?.isSome then some a else prev
+          scan (i+1) prev'
+    else none
+  scan 0 none
+
+open Lean Elab Tactic in
+/-- Reconstruye la táctica poniendo entre paréntesis desde el principio del
+primer hecho hasta la palabra que sigue a la conjunción. Es la corrección más
+probable: la conjunción era en realidad un argumento. -/
+def conjGroupText (tac : Syntax) : TacticM (Option String) := do
+  let some (prev, andNode, parent) := findConjContext tac | return none
+  let some factR := prev.getRange? | return none
+  let some andR := andNode.getRange? | return none
+  let some parR := parent.getRange? | return none
+  let src := (← getFileMap).source
+  let getc := String.Pos.Raw.get src
+  let mut p := match findSep src factR.start parR.stop andR.stop.byteIdx with
+    | some q => q
+    | none   => parR.stop
+  while p.byteIdx > factR.start.byteIdx && (getc (String.Pos.Raw.prev src p)).isWhitespace do
+    p := String.Pos.Raw.prev src p
+  if p.byteIdx ≤ factR.start.byteIdx then return none
+  if p.byteIdx ≤ andR.stop.byteIdx then return none
+  return some (String.Pos.Raw.extract src factR.start p)
+
+open Lean Elab Tactic in
+/-- Reconstruye la táctica ENTERA con el grupo entre paréntesis. Puede fallar
+aunque `conjGroupText` funcione: si la táctica llegó por expansión de una macro
+(`Afirmación ... ya que ...`), el rango de origen no cubre el texto que habría
+que reescribir. En ese caso hay nota pero no botón. -/
+def conjFixText (tac : Syntax) : TacticM (Option (String × String)) := do
+  let some (prev, andNode, parent) := findConjContext tac | return none
+  let some tacR := tac.getRange? | return none
+  let some factR := prev.getRange? | return none
+  let some andR := andNode.getRange? | return none
+  let some parR := parent.getRange? | return none
+  let src := (← getFileMap).source
+  let getc := String.Pos.Raw.get src
+  let nextc := String.Pos.Raw.next src
+  -- El corte correcto es la SIGUIENTE conjunción candidata: todo lo que va antes
+  -- pertenece al primer hecho.
+  let mut p := match findSep src factR.start parR.stop andR.stop.byteIdx with
+    | some q => q
+    | none   => parR.stop
+  -- recortar el espacio en blanco que quede antes del paréntesis de cierre
+  while p.byteIdx > factR.start.byteIdx && (getc (String.Pos.Raw.prev src p)).isWhitespace do
+    p := String.Pos.Raw.prev src p
+  if p.byteIdx ≤ factR.start.byteIdx then return none
+  -- El grupo tiene que TRAGARSE la conjunción. Si acaba antes, no arregla nada
+  -- (envolver `0` en `(0)` no cambia nada) y la pista sería ruido.
+  if p.byteIdx ≤ andR.stop.byteIdx then return none
+  -- Si lo que íbamos a envolver YA es un grupo entre paréntesis, envolverlo otra
+  -- vez sería absurdo (`((g y z) y P)`): significa que el corte problemático está
+  -- en otro sitio y no sabemos arreglarlo.
+  if getc factR.start == '(' then
+    let mut q := factR.start
+    let mut d := 0
+    let mut cierre := factR.start
+    while q.byteIdx < p.byteIdx do
+      let c := getc q
+      if "(⟨[{".contains c then d := d + 1
+      else if ")⟩]}".contains c then
+        d := d - 1
+        if d == 0 && cierre.byteIdx == factR.start.byteIdx then cierre := q
+      q := nextc q
+    if cierre.byteIdx ≥ (String.Pos.Raw.prev src p).byteIdx then return none
+  let pre := String.Pos.Raw.extract src tacR.start factR.start
+  let mid := String.Pos.Raw.extract src factR.start p
+  let post := String.Pos.Raw.extract src p tacR.stop
+  let fixed := pre ++ "(" ++ mid ++ ")" ++ post
+  -- COMPROBACIÓN: la sugerencia tiene que ser una táctica válida. Si el árbol de
+  -- sintaxis venía incompleto (porque la táctica ni siquiera parseaba), `fixed`
+  -- saldría truncado y aplicarlo BORRARÍA código del estudiante.
+  match Lean.Parser.runParserCategory (← getEnv) `tactic fixed with
+  | .error _ => return none
+  | .ok _ => return some (fixed, mid)
+
+open Lean Elab Tactic in
+/-- ¿Tiene sentido este texto como término en el contexto actual?
+
+Es la comprobación que da precisión a la pista: si `g y z` elabora, el
+estudiante casi seguro quería una aplicación y la `y` se leyó mal. Si no
+elabora (`P y Q` con `P` y `Q` proposiciones), el fallo es por otro motivo y no
+hay que decir nada.
+
+Hay que mirar tanto las excepciones como los errores REGISTRADOS: los numerales
+elaboran de forma perezosa y sólo registran, sin lanzar. Los mensajes de la
+comprobación se descartan para no duplicarlos. -/
+def textElaborates (txt : String) : TacticM Bool := do
+  let .ok stx := Lean.Parser.runParserCategory (← getEnv) `term txt | return false
+  let msgs0 := (← getThe Core.State).messages
+  let nErr (l : MessageLog) : Nat := (l.toList.filter (·.severity == .error)).length
+  let n0 := nErr msgs0
+  let ok ←
+    try
+      withMainContext do Term.withoutErrToSorry do
+        discard <| Term.elabTerm stx none
+        Term.synthesizeSyntheticMVarsNoPostponing
+        return true
+    catch _ => pure false
+  let n1 := nErr (← getThe Core.State).messages
+  modifyThe Core.State fun st => { st with messages := msgs0 }
+  return ok && n1 == n0
+
+open Lean Elab Tactic Lean.Meta.Tactic.TryThis in
+/-- Número de errores en un registro de mensajes. -/
+def numErrores (l : MessageLog) : Nat := (l.toList.filter (·.severity == .error)).length
+
+open Lean Elab Tactic Lean.Meta.Tactic.TryThis in
+/-- Decide POR ADELANTADO si procede una pista, y con qué texto.
+
+Se calcula antes de ejecutar la táctica porque las tres condiciones (hay
+conjunción, el grupo elabora, la corrección vuelve a parsear) no dependen de que
+la táctica se ejecute. Saberlo antes permite NO envolver la táctica cuando no hay
+nada que decir, que es justo lo que hace falta: ver la nota de `withConjHint`. -/
+def conjHintData (stx : Syntax) : TacticM (Option (String × Option String)) := do
+  unless hasConjSplit stx do return none
+  let some grupo ← conjGroupText stx | return none
+  unless ← textElaborates grupo do return none
+  let fixed? ← do
+    match ← conjFixText stx with
+    | some (f, _) => pure (some f)
+    | none        => pure none
+  return some (s!"Nota: se ha leído una `y` (o una `e`) como conjunción, pero `{grupo}` sí tiene sentido como una sola expresión. Si esa palabra era en realidad un argumento, ponlo entre paréntesis: `(P y)` en vez de `P y`.", fixed?)
+
+open Lean Elab Tactic Lean.Meta.Tactic.TryThis in
+/-- Ejecuta `k` añadiendo una pista si el fallo viene de una conjunción mal leída.
+
+Envolver una táctica en `try`/`catch` NO es inocuo: dentro de un `try` la
+elaboración lanza en vez de registrar, y al capturar se deshace el estado, con el
+registro de mensajes incluido. Envolviendo siempre, `Como A y Desconocido ...`
+dejaba de dar «identificador desconocido» y salía como un `sorry` MUDO, que es
+mucho peor que un error feo.
+
+Por eso se decide antes: si no hay pista que dar, la táctica se ejecuta sin
+tocarla. Sólo se envuelve cuando ya sabemos que hay algo que decir, y ahí se
+relanza con `throwError` (no con `throw e`, que pierde el mensaje) y sin tocar
+las excepciones internas, que son control de flujo de Lean. -/
+def withConjHint {α : Type} (stx : Syntax) (k : TacticM α) : TacticM α := do
+  match ← conjHintData stx with
+  | none => k
+  | some (nota, fixed?) =>
+    let ofrece : TacticM Unit := do
+      if let some f := fixed? then
+        addSuggestion (← getRef) { suggestion := .string f } (header := "Prueba con: ")
+    let n0 := numErrores (← getThe Core.State).messages
+    try
+      let a ← k
+      -- algunas tácticas terminan «bien» y sólo registran el error
+      if numErrores (← getThe Core.State).messages > n0 then
+        ofrece
+        logWarning nota
+      return a
+    catch e =>
+      match e with
+      | .internal _ _ => throw e
+      | _ =>
+        ofrece
+        throwError "{e.toMessageData}\n\n{nota}"
 
 declare_syntax_cat appliedToES
-syntax "aplicado a " sepBy1(term, ",", AndES) : appliedToES
+syntax "aplicado a " sepBy1(termUntilSep, ", ", AndES) : appliedToES
 
 def appliedToESTerm : TSyntax `appliedToES → Array Term
 | `(appliedToES| aplicado a $[$args],*) => args
@@ -18,7 +215,7 @@ def appliedToESTerm : TSyntax `appliedToES → Array Term
 
 
 declare_syntax_cat usingStuffES
-syntax " usando " sepBy1(term, ",", AndES) : usingStuffES
+syntax " usando " sepBy1(termUntilSep, ", ", AndES) : usingStuffES
 syntax " usando que " term : usingStuffES
 
 def usingStuffESToTerm : TSyntax `usingStuffES → Array Term
@@ -27,7 +224,7 @@ def usingStuffESToTerm : TSyntax `usingStuffES → Array Term
 | _ => default -- This will never happen as long as nobody extends appliedToES
 
 declare_syntax_cat maybeAppliedES
-syntax term (appliedToES)? (usingStuffES)? : maybeAppliedES
+syntax termUntilSep (appliedToES)? (usingStuffES)? : maybeAppliedES
 
 def maybeAppliedESToTerm : TSyntax `maybeAppliedES → MetaM Term
 | `(maybeAppliedES| $e:term) => pure e
@@ -52,7 +249,7 @@ declare_syntax_cat newStuffES
 syntax (ppSpace colGt maybeTypedIdent)* : newStuffES
 syntax maybeTypedIdent "tal que" ppSpace colGt maybeTypedIdent : newStuffES
 syntax maybeTypedIdent "tal que" ppSpace colGt maybeTypedIdent AndES
-       ppSpace colGt maybeTypedIdent : newStuffES
+       colGt maybeTypedIdent : newStuffES
 
 def newStuffESToArray : TSyntax `newStuffES → Array MaybeTypedIdent
 | `(newStuffES| $news:maybeTypedIdent*) => Array.map toMaybeTypedIdent news
@@ -65,7 +262,7 @@ def newStuffESToArray : TSyntax `newStuffES → Array MaybeTypedIdent
 def listMaybeTypedIdentToNewStuffSuchThatES : List MaybeTypedIdent → MetaM (TSyntax `newStuffES)
 | [x] => do `(newStuffES| $(← x.stx):maybeTypedIdent)
 | [x, z] => do `(newStuffES| $(← x.stx):maybeTypedIdent tal que $(← z.stx'))
-| [x, z, y] => do `(newStuffES| $(← x.stx):maybeTypedIdent tal que $(← z.stx) ,y $(← y.stx))
+| [x, z, y] => do `(newStuffES| $(← x.stx):maybeTypedIdent tal que $(← z.stx) y $(← y.stx))
 | _ => pure default
 
 declare_syntax_cat newFactsES
@@ -104,8 +301,8 @@ def newFactsESToRCasesPatt : TSyntax `newFactsES → RCasesPatt
 
 def listMaybeTypedIdentToNewFactsES : List MaybeTypedIdent → MetaM (TSyntax `newFactsES)
 | [x] => do `(newFactsES| $(.mk (← x.stx)))
-| [x, v] => do `(newFactsES| $(.mk (← x.stx).raw):namedType ,y $(.mk (← v.stx)))
-| [x, v, z] => do `(newFactsES| $(.mk (← x.stx)):namedType, $(.mk (← v.stx)) ,y $(.mk (← z.stx)))
+| [x, v] => do `(newFactsES| $(.mk (← x.stx).raw):namedType y $(.mk (← v.stx)))
+| [x, v, z] => do `(newFactsES| $(.mk (← x.stx)):namedType, $(.mk (← v.stx)) y $(.mk (← z.stx)))
 | _ => pure default
 
 syntax talesQue := "tal que " <|> "tales que "
@@ -181,14 +378,14 @@ def newObjectESToRCasesPatt (newObj : TSyntax `newObjectES) : RCasesPatt :=
 -- FIXME: the code below is ugly, written in a big hurry.
 def listMaybeTypedIdentToNewObjectES : List MaybeTypedIdent → MetaM (TSyntax `newObjectES)
 | [x, v] => do `(newObjectES| $(← x.stx):maybeTypedIdent tal que $(← v.stx'))
-| [x, v, z] => do `(newObjectES| $(← x.stx):maybeTypedIdent tal que $(← v.stx) ,y $(← z.stx))
+| [x, v, z] => do `(newObjectES| $(← x.stx):maybeTypedIdent tal que $(← v.stx) y $(← z.stx))
 | _ => pure default
 
 declare_syntax_cat factsES
 syntax term : factsES
-syntax term AndES term : factsES
-syntax term ", " term AndES term : factsES
-syntax term ", " term ", " term AndES term : factsES
+syntax termUntilSep AndES term : factsES
+syntax termUntilSep ", " termUntilSep AndES term : factsES
+syntax termUntilSep ", " termUntilSep ", " termUntilSep AndES term : factsES
 
 def factsESToArray : TSyntax `factsES → Array Term
 | `(factsES| $x:term) => #[x]
@@ -199,9 +396,9 @@ def factsESToArray : TSyntax `factsES → Array Term
 
 def arrayToFactsES : Array Term → CoreM (TSyntax `factsES)
 | #[x] => `(factsES| $x:term)
-| #[x, v] => `(factsES| $x:term ,y $v:term)
-| #[x, v, z] => `(factsES| $x:term, $v:term ,y $z:term)
-| #[x, v, z, w] => `(factsES| $x:term, $v:term, $z:term ,y $w:term)
+| #[x, v] => `(factsES| $x:term y $v:term)
+| #[x, v, z] => `(factsES| $x:term, $v:term y $z:term)
+| #[x, v, z, w] => `(factsES| $x:term, $v:term, $z:term y $w:term)
 | _ => default
 
 def factsESToTypeTerm : TSyntax `factsES → MetaM Term
@@ -227,12 +424,12 @@ def _root_.Lean.Expr.toMaybeAppliedES (e : Expr) : MetaM (TSyntax `maybeAppliedE
 
 declare_syntax_cat newObjectNameLessES
 syntax maybeTypedIdent "tal que " term : newObjectNameLessES
-syntax maybeTypedIdent "tal que " term colGt AndES term : newObjectNameLessES
-syntax maybeTypedIdent "tal que " term ", " colGt term colGt AndES term : newObjectNameLessES
+syntax maybeTypedIdent "tal que " termUntilSep colGt AndES term : newObjectNameLessES
+syntax maybeTypedIdent "tal que " termUntilSep ", " colGt termUntilSep colGt AndES term : newObjectNameLessES
 
 syntax maybeTypedIdent AndES maybeTypedIdent "tal que " term : newObjectNameLessES
-syntax maybeTypedIdent AndES maybeTypedIdent "tal que " term colGt AndES term : newObjectNameLessES
-syntax maybeTypedIdent AndES maybeTypedIdent "tal que " term ", " colGt term colGt AndES term : newObjectNameLessES
+syntax maybeTypedIdent AndES maybeTypedIdent "tal que " termUntilSep colGt AndES term : newObjectNameLessES
+syntax maybeTypedIdent AndES maybeTypedIdent "tal que " termUntilSep ", " colGt termUntilSep colGt AndES term : newObjectNameLessES
 
 def newObjectNameLessESToLists : TSyntax `newObjectNameLessES → (List (TSyntax `maybeTypedIdent) × List Term)
 | `(newObjectNameLessES| $x:maybeTypedIdent tal que $new) =>
@@ -265,8 +462,8 @@ def newObjectNameLessESToRCasesPatt (no : TSyntax `newObjectNameLessES) : RCases
 def listMaybeTypedIdentToNewObjectNameLessES : List MaybeTypedIdent → MetaM (TSyntax `newObjectNameLessES)
 | [(x, some t), (_, some s)] => do `(newObjectNameLessES| ($(mkIdent x):ident : $t) tal que $s)
 | [(x, none), (_, some s)] => do `(newObjectNameLessES| $(mkIdent x):ident tal que $s)
-| [(x, none), (_, some s), (_, some r)] => do `(newObjectNameLessES| $(mkIdent x):ident tal que $s ,y $r)
-| [(x, some t), (_, some s), (_, some r)] => do `(newObjectNameLessES| ($(mkIdent x):ident : $t) tal que $s ,y $r)
+| [(x, none), (_, some s), (_, some r)] => do `(newObjectNameLessES| $(mkIdent x):ident tal que $s y $r)
+| [(x, some t), (_, some s), (_, some r)] => do `(newObjectNameLessES| ($(mkIdent x):ident : $t) tal que $s y $r)
 | _ => pure default
 
 implement_endpoint (lang := es) nameAlreadyUsed (n : Name) : CoreM String :=

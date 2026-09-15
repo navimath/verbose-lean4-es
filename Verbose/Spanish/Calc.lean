@@ -75,7 +75,7 @@ namespace Lean.Elab.Tactic
 open Meta Verbose Spanish
 
 declare_syntax_cat CalcFirstStepES
-syntax ppIndent(colGe term (" por "  sepBy1(maybeAppliedES, ",", AndES))?) : CalcFirstStepES
+syntax ppIndent(colGe term (" por "  sepBy1(maybeAppliedES, ", ", AndES))?) : CalcFirstStepES
 /- syntax ppIndent(colGe term (" por hipótesis")?) : CalcFirstStepES -/
 syntax ppIndent(colGe term (" por cuentas")?) : CalcFirstStepES
 syntax ppIndent(colGe term (" ya que " factsES)?) : CalcFirstStepES
@@ -84,7 +84,7 @@ syntax ppIndent(colGe term (" usando " tacticSeq)?) : CalcFirstStepES
 
 -- enforce indentation of calc steps so we know when to stop parsing them
 declare_syntax_cat CalcStepES
-syntax ppIndent(colGe term " por " sepBy1(maybeAppliedES, ",", AndES)) : CalcStepES
+syntax ppIndent(colGe term " por " sepBy1(maybeAppliedES, ", ", AndES)) : CalcStepES
 /- syntax ppIndent(colGe term " por hipótesis") : CalcStepES -/
 syntax ppIndent(colGe term " por cuentas") : CalcStepES
 syntax ppIndent(colGe term " ya que " factsES) : CalcStepES
@@ -95,7 +95,8 @@ syntax calcStepsES := ppLine withPosition(CalcFirstStepES) withPosition((ppLine 
 
 syntax (name := calcTacticES) "Por desarrollo" calcStepsES : tactic
 
-elab tk:"comoCalcTac" factsES:factsES : tactic => withRef tk <| sinceCalcTac (factsESToArray factsES)
+elab tk:"comoCalcTac" factsES:factsES : tactic =>
+  withRef tk <| withConjHint factsES.raw <| sinceCalcTac (factsESToArray factsES)
 
 def convertFirstCalcStepES (step : TSyntax `CalcFirstStepES) : TermElabM (TSyntax ``calcFirstStep × Option Syntax) := do
   match step with
@@ -225,15 +226,15 @@ example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
 
 example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
   Por desarrollo a + 0 + c = a + c por cuentas
-            _              ≤ b + d ya que a ≤ b ,y c ≤ d
+            _              ≤ b + d ya que a ≤ b y c ≤ d
 
 example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
   Por desarrollo a + 0 + c = a + c por cuentas
-            _              ≤ b + d por h ,y h'
+            _              ≤ b + d por h y h'
 
 example (a b c d : ℕ) (h : a ≤ b) (h' : c ≤ d) : a + 0 + c ≤ b + d := by
   Por desarrollo a + 0 + c = a + c por cuentas
-            _              ≤ b + d por h ,e h'
+            _              ≤ b + d por h e h'
 
 def even_fun  (f : ℝ → ℝ) := ∀ x, f (-x) = f x
 
