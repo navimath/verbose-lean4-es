@@ -86,7 +86,7 @@ example (n : ℕ) : n + n + n = 3*n := by
 example (n : ℤ) (h : 0 < n) : True := by
   Afirmación key : 0 < 2*n por
     linarith only [h]
-  Afirmación keybis : 0 < 2*n pues mul_pos aplicado a zero_lt_two ,y h
+  Afirmación keybis : 0 < 2*n pues mul_pos aplicado a zero_lt_two y h
   trivial
 end
 
@@ -123,7 +123,7 @@ example (n : ℕ) : n + n + n = 3*n := by
 example (n : ℤ) (h : 0 < n) : True := by
   Afirmación: 0 < 2*n por
     linarith only [h]
-  Afirmación: 0 < 2*n pues mul_pos aplicado a zero_lt_two ,e h
+  Afirmación: 0 < 2*n pues mul_pos aplicado a zero_lt_two e h
   trivial
 
 lemma foo_ex : ∃ N : Nat, True := by simp
