@@ -9,16 +9,24 @@ heurísticas:
 
 1. la conjunción va precedida de algo que puede TERMINAR un término
    (`canEndTerm`), a profundidad de paréntesis 0 y fuera de una cabecera de
-   ligadura (`∀ ∃ λ Σ Π`, `fun`, hasta `,`, `=>` o `↦`);
+   ligadura (`∀ ∃ λ Σ Π ∑ ∏ ⋃ ⋂ ⨆ ⨅`, `fun`, hasta `,`, `=>` o `↦`);
 2. detrás de la conjunción viene algo que puede EMPEZAR un término
    (`canStartTerm`): así `f e = 0` no se parte, porque `=` no empieza término;
 3. si el segundo miembro salta de línea, tiene que ir más indentado que el
    hecho: así `se tiene que P y` no se traga la táctica siguiente.
 
+Además, el escáner sabe qué partes del texto NO son código (cadenas,
+comentarios `--` y comentarios de bloque `/- -/`, anidados incluidos) y no sale
+nunca del bloque de la táctica: se detiene en la primera línea que vuelve a la
+sangría del hecho o por debajo. La sangría se mide hasta el primer carácter de
+código, así que el foco de viñeta (`· ...`) cuenta como sangría.
+
 Con esto, el banco de ejemplos entero (327 ejemplos) compila sin un solo
 paréntesis añadido. Lo que queda documentado aquí es lo que sigue fallando.
 
-Los casos que fallan van COMENTADOS, porque si no el fichero no compilaría.
+Los casos que fallan van COMENTADOS, porque si no el fichero no compilaría. Los
+que fallan ELABORANDO, en cambio, sí se pueden ejecutar con `fail_if_success`, y
+así son tests de verdad en vez de prosa: ver §1g.
 -/
 
 open Verbose.Named
@@ -413,17 +421,146 @@ example (A B C : Prop) (hA : A) (hB : B) (hC : C) : A ∧ B ∧ C := by
   Como A, B y C concluimos que A ∧ B ∧ C
 
 /-!
-## Excepción 2: las tres listas están escritas a mano
+### 1g. Los fallos de la Excepción 1, como tests ejecutables
 
-`canEndTerm`, `canStartTerm` y la lista de ligadores son aproximaciones
-manuales de lo que el parser de Lean sabe de verdad. Cada notación nueva de
-Mathlib o de Verbose es un fallo en potencia.
+Arriba, cada caso que falla va en un comentario, porque un fichero con un error
+no compila. Pero eso sólo hace falta cuando el fallo es de SINTAXIS. Los de la
+Excepción 1 son de ELABORACIÓN —la táctica parsea, y da error al elaborar—, así
+que `fail_if_success` los ejecuta de verdad: la táctica falla, el combinador lo
+da por bueno, y el objetivo se cierra después a mano, con Lean pelado, que aquí
+es lo que toca: lo que se está probando es el fallo, no la prueba.
+
+Así el error deja de ser una descripción y pasa a ser un test. Si algún día
+`Como g y z y P ...` empezara a funcionar —porque alguien encontrara la manera
+de distinguir `f y` de `f` ⊗ `y` sin tipos—, estos ejemplos dejarían de
+compilar y habría que venir aquí a quitarlos. Es la única forma de que la
+documentación de un fallo no se quede obsoleta en silencio.
+
+Lo que NO se puede escribir así es el §1b: allí el corte rompe la sintaxis de la
+táctica entera, el parser se detiene y dentro del `fail_if_success` no llega a
+ejecutarse nada. Mismo motivo por el que allí tampoco hay pista, y por el que la
+Excepción 2 tampoco se puede testear.
+-/
+
+-- Como ... concluimos que
+example (g : ℕ → ℕ → Prop) (y z : ℕ) (P : Prop) (h : g y z) (hP : P) :
+    g y z ∧ P := by
+  fail_if_success (Como g y z y P concluimos que g y z ∧ P)
+  exact ⟨h, hP⟩
+
+-- lo mismo con `e` (§1)
+example (g : ℕ → ℕ → Prop) (e z : ℕ) (P : Prop) (h : g e z) (hP : P) :
+    g e z ∧ P := by
+  fail_if_success (Como g e z y P concluimos que g e z ∧ P)
+  exact ⟨h, hP⟩
+
+-- §1a: no hace falta que haya conjunción para que se parta
+example (g : ℕ → ℕ → Prop) (y z : ℕ) (h : g y z)
+    (hex : g y z → ∃ k : ℕ, k = 0) : True := by
+  fail_if_success (Como g y z obtenemos k tal que k = 0)
+  trivial
+
+-- Como ... se tiene que
+example (g : ℕ → ℕ → Prop) (y z : ℕ) (P : Prop) (hg : g y z) (hP : P) : True := by
+  fail_if_success (Como g y z y P se tiene que (g y z) ∧ P)
+  trivial
+
+-- Supongamos que ...
+example (g : ℕ → ℕ → Prop) (y z : ℕ) (Q : Prop) : g y z → Q → True := by
+  fail_if_success (Supongamos que g y z y Q)
+  intro _ _
+  trivial
+
+-- Concluimos por ... aplicado a ...
+example (P : ℕ → ℕ → Prop) (g : ℕ → ℕ → ℕ) (y z : ℕ) (h : ∀ a b, P a b) :
+    P (g y z) 1 := by
+  fail_if_success (Concluimos por h aplicado a g y z y 1)
+  exact h _ _
+
+/-!
+### 1h. El texto de la sugerencia puede salir cortado (cosmético, SIN ARREGLAR)
+
+`conjFixText` compone la sugerencia a partir del rango del NODO de táctica que
+el parser llegó a construir. En `Supongamos que g y z, Q y R` ese nodo acaba en
+`z`, así que la sugerencia se imprime sin la cola y parece que va a BORRAR el
+`, Q y R`. No lo borra: `addSuggestion` sustituye ese mismo rango, y la cola se
+queda donde estaba (`Supongamos que (g y z), Q y R`, que compila). Sólo engaña a
+quien LEE la nota en vez de pulsar el botón.
+
+Va COMENTADO porque `#guard_msgs` sólo captura los mensajes de SU comando, y la
+cola sobrante produce además un `unexpected token ','; expected command` de
+nivel de COMANDO que se queda fuera y tumbaría el fichero igual. Los mensajes
+son los de la ejecución real; ojo, la línea del `info:` lleva un espacio final.
+
+    /--
+    info: Prueba con:
+      [apply] Supongamos que (g y z)
+    ---
+    error: El término
+      g
+     no es igual por definición a
+      g y z
+
+    Nota: se ha leído una `y` (o una `e`) como conjunción, pero `g y z` sí tiene
+    sentido como una sola expresión. Si esa palabra era en realidad un argumento,
+    ponlo entre paréntesis: `(P y)` en vez de `P y`.
+    -/
+    #guard_msgs in
+    example (g : ℕ → ℕ → Prop) (y z : ℕ) (Q R : Prop) : g y z → Q → R → True := by
+      Supongamos que g y z, Q y R
+      trivial
+-/
+
+/-!
+## Excepción 2: las listas de caracteres están escritas a mano
+
+`canEndTerm`, `canStartTerm` e `isBinderHead` son aproximaciones manuales de lo
+que el parser de Lean sabe de verdad. Cada notación nueva de Mathlib o de
+Verbose es un fallo en potencia.
 
 No es teórico: al añadir `fun` hubo que añadir también `↦`, porque sin él
 `fun y ↦ y` se cortaba en el cuerpo. Y `λ` parecía funcionar cuando en realidad
 no lo hacía, por un motivo distinto (nadie cerraba la ligadura).
 
-El síntoma siempre es un error de sintaxis confuso, nunca un aviso claro.
+Falla de dos maneras, y no son igual de graves:
+
+* si a `isBinderHead` le FALTA un ligador, el corte se hace dentro de la
+  cabecera, por una variable LIGADA. Es lo que pasaba con los operadores
+  grandes: `⋃ y z, ...` se partía por la `y` ligada. Con un solo ligador
+  (`⋃ y, ...`) se salvaba solo, por la heurística 2: detrás de la `y` viene una
+  coma, que no empieza término.
+* si a las otras dos listas les SOBRA un carácter, no se reconoce la conjunción
+  y no se parte nada. Es lo que pasaba con `|`: un hecho que acababa en barra
+  (`ε ≥ |u n - l| y ...`) o el siguiente que empezaba por barra
+  (`... y |u n - l| ≤ ε`) dejaban la frase entera como un solo término.
+
+El segundo caso es el peor de los dos, y conviene tenerlo presente al tocar
+estas listas: la pista de `withConjHint` sólo se dispara cuando SÍ ha habido un
+corte. Si el corte no llega a hacerse no hay nodo `AndES` en el árbol, no hay
+nada que diagnosticar, y el estudiante se queda con el error pelado de Lean.
+
+El síntoma siempre es un error confuso, nunca un aviso claro.
+
+### Por qué esta excepción no se puede escribir como test
+
+Los dos ejemplos de arriba ya están arreglados (`⋃` está en la lista, `|` ya no
+está en las otras dos), así que hoy compilan: no hay nada que atrapar.
+
+Pero aunque se reprodujeran con otra notación —y se reproducen: `∫ y z, ...`,
+`⨍ y z, ...`, `∐ y z, ...` siguen partiéndose por la variable ligada, sólo que
+Verbose no importa esa notación— `fail_if_success` tampoco valdría. Cortar
+dentro de una cabecera de ligadura deja un fragmento que ni siquiera parsea:
+
+    Como ⋀ y z : ℕ, y = z y P concluimos que ...
+
+    error: unexpected end of input; expected '(', '_' o identificador
+
+y `fail_if_success` es un combinador de TÁCTICAS: sólo ve los fallos de
+ELABORACIÓN. Cuando el parser se detiene, dentro del `fail_if_success` no llega
+a ejecutarse nada y el fichero entero deja de compilar. Es el mismo motivo por
+el que el §1b tampoco lleva pista.
+
+La Excepción 1 sí falla elaborando, y por eso allí sí se puede: ver §1g.
 -/
 
 /-!
@@ -486,8 +623,141 @@ example (s : String) (P : Prop) (h : s = "esto y aquello") (hP : P) :
     s = "esto y aquello" ∧ P := by
   Como s = "esto y aquello" y P concluimos que s = "esto y aquello" ∧ P
 
--- ni dentro de un comentario de bloque
+/-!
+### Valor absoluto
+
+A profundidad 0 una barra sólo puede abrir o cerrar un valor absoluto: la del
+constructor de conjuntos (`{y | y = y}`) va siempre dentro de llaves, o sea a
+profundidad ≥ 1. Así que `|` no estorba al corte por ninguno de los dos lados.
+
+Importa más de lo que parece: `|u n - l|` es el vocabulario básico de los
+ejemplos de análisis, y aparece a los dos lados de la conjunción.
+-/
+
+-- la barra CIERRA el primer hecho
+example (u : ℕ → ℝ) (l ε : ℝ) (n N : ℕ) (hu : ε ≥ |u n - l|) (hn : n ≥ N) :
+    ε ≥ |u n - l| ∧ n ≥ N := by
+  Como ε ≥ |u n - l| y n ≥ N concluimos que ε ≥ |u n - l| ∧ n ≥ N
+
+-- la barra ABRE el segundo
+example (u : ℕ → ℝ) (l ε : ℝ) (n N : ℕ) (hn : n ≥ N) (hu : |u n - l| ≤ ε) :
+    n ≥ N ∧ |u n - l| ≤ ε := by
+  Como n ≥ N y |u n - l| ≤ ε concluimos que n ≥ N ∧ |u n - l| ≤ ε
+
+-- y en una lista de tres
+example (u : ℕ → ℝ) (l ε : ℝ) (n N : ℕ) (hn : n ≥ N) (hu : |u n - l| ≤ ε)
+    (he : ε > 0) : n ≥ N ∧ |u n - l| ≤ ε ∧ ε > 0 := by
+  Como n ≥ N, |u n - l| ≤ ε y ε > 0 concluimos que n ≥ N ∧ |u n - l| ≤ ε ∧ ε > 0
+
+example (u : ℕ → ℝ) (l ε : ℝ) (n : ℕ) : |u n - l| ≤ ε → ε > 0 → True := by
+  Supongamos que |u n - l| ≤ ε y ε > 0
+  trivial
+
+-- la barra del constructor de conjuntos, a profundidad 1, tampoco estorba
+example (s : Set ℕ) (P : Prop) (hP : P) (h : s = {y | y = y}) :
+    P ∧ s = {y | y = y} := by
+  Como P y s = {y | y = y} concluimos que P ∧ s = {y | y = y}
+
+/-!
+### Comentarios
+
+Un comentario es espacio en blanco para el escáner: no cambia el `lastEnd` ni
+la profundidad de paréntesis. Los de bloque se saltan enteros, con anidamiento,
+y se miran ANTES que las comillas, para que una comilla suelta dentro de un
+comentario no se lea como principio de cadena.
+-/
+
 example (P Q : Prop) (hP : P) (hQ : Q) : P ∧ Q := by
   Como P /- esto y aquello -/ y Q concluimos que P ∧ Q
+
+-- el comentario es justo la palabra `y`
+example (P Q : Prop) (hP : P) (hQ : Q) : P ∧ Q := by
+  Como P /- y -/ y Q concluimos que P ∧ Q
+
+-- paréntesis descuadrados dentro del comentario
+example (P Q : Prop) (hP : P) (hQ : Q) : P ∧ Q := by
+  Como P /- ) ( -/ y Q concluimos que P ∧ Q
+
+-- una comilla suelta
+example (P Q : Prop) (hP : P) (hQ : Q) : P ∧ Q := by
+  Como P /- una " suelta -/ y Q concluimos que P ∧ Q
+
+-- comentarios anidados
+example (P Q : Prop) (hP : P) (hQ : Q) : P ∧ Q := by
+  Como P /- (a /- anidado -/ b -/ y Q concluimos que P ∧ Q
+
+-- comentario de línea entre la conjunción y el segundo miembro
+example (P Q : Prop) (hP : P) (hQ : Q) : P ∧ Q := by
+  Como P y -- nota y tal
+    Q concluimos que P ∧ Q
+
+/--
+### Big operators are also binders
+
+`∑ ∏ ⋃ ⋂ ⨆ ⨅` abren cabecera de ligadura igual que `∀`.
+
+Verbose no importa esa notación, así que aquí no se puede escribir un `example`
+que elabore. Como la regla es puramente léxica, se prueba donde vive: sobre
+`findSep`, con `⊗` marcando el punto de corte.
+
+/-- Dónde corta el escáner, con `⊗` en el punto de corte. -/
+private def corte (s : String) : String :=
+  match Verbose.Spanish.findSep s ⟨0⟩ s.rawEndPos with
+  | none   => s
+  | some p => String.Pos.Raw.extract s ⟨0⟩ p ++ "⊗ " ++ String.Pos.Raw.extract s p s.rawEndPos
+
+#guard corte "s = ⋃ y z, {y + z} y P" == "s = ⋃ y z, {y + z} ⊗ y P"
+#guard corte "s = ⋂ y z, {y * z} y P" == "s = ⋂ y z, {y * z} ⊗ y P"
+#guard corte "n = ∑ y z, (y + z) y P" == "n = ∑ y z, (y + z) ⊗ y P"
+
+-- con un solo ligador ya se salvaba por la heurística 2: detrás de la `y`
+-- ligada viene una coma, que no puede empezar término
+#guard corte "s = ⋃ y, {y} y P"       == "s = ⋃ y, {y} ⊗ y P"
+-/
+
+example : 1=1 := rfl
+
+/-!
+### Sangría, viñetas y final del bloque
+
+La sangría se mide hasta el primer carácter de CÓDIGO de la línea, así que el
+foco de viñeta (`·`) cuenta como sangría. Si sólo se contaran los espacios, el
+cuerpo de la viñeta parecería más indentado que su propia línea y la táctica
+siguiente entraría como segundo miembro de la conjunción.
+
+Y el escáner no sale del bloque de la táctica: en cuanto una línea vuelve a la
+sangría del hecho o por debajo, deja de buscar. No es sólo cuestión de coste
+(sin ese límite el escáner recorría el fichero ENTERO por cada hecho): una `y`
+de la táctica siguiente no puede ser la conjunción de ésta.
+-/
+
+-- dentro de una viñeta, la táctica siguiente no se engulle
+example (P : ℕ → Prop) (x y : ℕ) (h : x = y) (h' : P x) : P y ∧ True := by
+  constructor
+  · Como x = y y P x se tiene que P y
+    exact hPy
+  · trivial
+
+-- ni con viñetas anidadas
+example (P : ℕ → Prop) (x y : ℕ) (h : x = y) (h' : P x) : (P y ∧ True) ∧ True := by
+  constructor
+  · constructor
+    · Como x = y y P x se tiene que P y
+      exact hPy
+    · trivial
+  · trivial
+
+-- pero el segundo miembro sí sigue en la línea siguiente si va más indentado
+example (P Q : Prop) (hP : P) (hQ : Q) : (P ∧ Q) ∧ True := by
+  constructor
+  · Como P y
+      Q concluimos que P ∧ Q
+  · trivial
+
+-- una línea en blanco por medio no es salir del bloque
+example (P Q : Prop) (hP : P) (hQ : Q) : P ∧ Q := by
+  Como P y
+
+    Q concluimos que P ∧ Q
 
 end VerboseExcepciones

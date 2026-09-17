@@ -265,3 +265,154 @@ Verbose es un fallo en potencia. No es teórico: al añadir `fun` hubo que añad
   leyéndolas. Así se encontraron los dos fallos del párrafo de `conjFixText`.
 * Comprobado que no queda ningún `sorry` silencioso: ningún fichero español
   produce el aviso `declaration uses 'sorry'`.
+
+---
+
+# Revisión del escáner — 17/09/2026, Iván Martínez
+
+Cinco cambios en `Conjunction.lean`. Los cuatro primeros son fallos que el banco
+de 327 ejemplos no cubría; el quinto es de coste, y de paso de correctitud.
+
+Un aviso que conviene tener presente al leer lo que sigue: la pista de
+`withConjHint` sólo se dispara cuando SÍ ha habido un corte. Si el escáner no
+llega a cortar, no hay nodo `AndES` en el árbol, no hay nada que diagnosticar y
+el estudiante se queda con el error pelado de Lean. Por eso los fallos «no
+corta» (1 y 3) son peores que los fallos «corta mal» (2).
+
+## 1. `|` fuera de las dos listas de caracteres
+
+```lean
+-  !c.isWhitespace && !"=<>≤≥≠+-*/^∈∉⊆∧∨→↔↦∘¬,;:(⟨[{|".contains c   -- canEndTerm
++  !c.isWhitespace && !"=<>≤≥≠+-*/^∈∉⊆∧∨→↔↦∘¬,;:(⟨[{".contains c
+-  !c.isWhitespace && !"=<>≤≥≠+*/^∈∉⊆∧∨→↔↦∘,;:)⟩]}|".contains c     -- canStartTerm
++  !c.isWhitespace && !"=<>≤≥≠+*/^∈∉⊆∧∨→↔↦∘,;:)⟩]}".contains c
+```
+
+Con `|` en las listas, un hecho que acababa en barra o el siguiente que
+empezaba por barra dejaban la frase entera como un solo término:
+
+```
+Como n ≥ N y |u n - l| ≤ ε concluimos que ...
+  error: unexpected token '≤'; expected 'basta', 'concluimos', ...
+```
+
+Sin nota y sin botón, porque no hubo corte. Y es vocabulario básico de los
+ejemplos: antes de este cambio `Verbose/Spanish` ya tenía 95 valores absolutos,
+`|u n - l|` 20 veces, `|u n - x₀|` 9, `|x - x₀|` 5, `|f (u n) - f x₀|` 5. El
+banco pasaba porque ninguno de ellos pone una conjunción al lado de una barra.
+
+Quitarlas es seguro: a profundidad 0 una barra sólo puede abrir o cerrar un
+valor absoluto. La del constructor de conjuntos (`{y | y = y}`) va siempre
+dentro de llaves, o sea a profundidad ≥ 1, y al salir de un paréntesis `lastEnd`
+ya se pone a `true` de todos modos. La de divisibilidad es otro carácter (`∣`,
+U+2223) y no estaba en las listas.
+
+## 2. Los operadores grandes también ligan variables
+
+```lean
+-def isBinderHead (c : Char) : Bool := "∀∃λΣΠ".contains c
++def isBinderHead (c : Char) : Bool := "∀∃λΣΠ∑∏⋃⋂⨆⨅⨁⨂".contains c
+```
+
+Sin ellos, el corte se hacía dentro de la cabecera, por una variable LIGADA:
+
+```
+s = ⋃ y z, {y + z} y P     antes: s = ⋃ ⊗ y z, ...     ahora: s = ⋃ y z, {y + z} ⊗ y P
+```
+
+Con un solo ligador (`⋃ y, ...`) ya se salvaba solo, por la heurística 2:
+detrás de la `y` ligada viene una coma, que no puede empezar término. El fallo
+sólo aparecía con dos o más.
+
+## 3. Comentarios de bloque
+
+Antes sólo se trataba `--`. El contenido de un `/- -/` movía `lastEnd` y la
+profundidad de paréntesis, así que `Como P /- y -/ y Q` o `Como P /- ) ( -/ y Q`
+se quedaban sin conjunción. Peor: una comilla suelta dentro de un comentario
+mandaba `skipString` hasta el final del fichero.
+
+Se añade `skipBlock`, con anidamiento, y se mira ANTES que las comillas. El
+comentario es espacio en blanco, así que `lastEnd` se conserva al saltarlo.
+
+## 4. La sangría se mide hasta el primer carácter de código
+
+```lean
++def isIndentChar (c : Char) : Bool :=
++  c == ' ' || c == '\t' || c == '\r' || c == '·' || c == '.'
+```
+
+`indentAt` contaba espacios iniciales. Un foco de viñeta (`·`) no es un espacio,
+así que el cuerpo de la viñeta parecía MÁS indentado que su propia línea y la
+heurística 3 dejaba pasar la táctica siguiente como segundo miembro:
+
+```
+constructor
+· Como x = y y P x se tiene que P y
+  exact hPy                              -- se lo tragaba
+```
+```
+error: Unknown identifier `exact`
+error: No se pudo probar: ⊢ sorry ∧ sorry
+```
+
+La misma táctica sin viñeta funcionaba, que es lo que hacía difícil de ver el
+fallo. Ahora `indentAt` devuelve la byte-columna del primer carácter de código,
+que es la misma unidad que usa `colOf`.
+
+(`\t` está por simetría, pero es código muerto: Lean rechaza los tabuladores.)
+
+## 5. El escáner no sale del bloque de la táctica
+
+`stop` es `c.endPos`, o sea el final del FICHERO. Cuando una táctica no tenía
+conjunción detrás — que es el caso más común, `Como h concluimos que P` —
+`findSep` recorría el resto del fichero entero. Coste cuadrático en el tamaño
+del fichero:
+
+| fichero | antes | ahora |
+|---|---|---|
+| 400 ejemplos sin conjunción | 31,8 s | 1,6 s |
+| 100 ejemplos + 8000 líneas de comentario al final | 14,4 s | 1,6 s |
+
+La segunda fila es el control: 8000 líneas de comentario no añaden ni un
+objetivo que elaborar, y costaban 8,8 s.
+
+No es sólo coste. Al pasarse de largo, el escáner podía cortar por una `y` de la
+táctica SIGUIENTE:
+
+```
+Como h concluimos que P
+exact foo y bar            -- antes cortaba aquí
+```
+
+`leavesBlock` para en la primera línea no vacía que vuelve a la sangría del
+hecho o por debajo. Ninguna `y` posterior podría aceptarse ya, porque la
+heurística 3 la rechazaría.
+
+Un detalle que costó un intento fallido: `inBinder` NO se reinicia al saltar de
+línea. Parece razonable hacerlo, pero una cabecera de ligadura puede partirse en
+dos líneas y entonces la `y` de la segunda sigue siendo una variable ligada:
+
+```
+Como ∀ x
+      y z : ℕ, x + y + z = 0 y P ...
+```
+
+Reiniciarlo cortaba justo ahí, por la `y` ligada — el mismo fallo del punto 2,
+reintroducido. Y no hace falta: toda cabecera se cierra con `,`, `=>` o `↦`. Hay
+un comentario en el código para que no se vuelva a añadir.
+
+## Verificación
+
+* `lake build`: 1276 objetivos, sin errores. `Examples.lean` compila sin tocarlo,
+  y los 327 ejemplos del banco siguen sin necesitar un solo paréntesis añadido.
+* Comparando el escáner viejo y el nuevo sobre unas 60 cadenas, sólo cambian 12,
+  y las 12 a mejor (2 de ligadores, 5 de comentarios, 4 de barras, 1 de invadir
+  la táctica siguiente). El resto sale idéntico byte a byte.
+* Las sugerencias con botón [apply] salen idénticas a las de antes en todos los
+  casos comprobados: listas de tres y de cuatro hechos, conjunción partida en
+  dos líneas, `obtenemos`, `usando` y `Supongamos que`. Y siguen sin ofrecerse
+  cuando el grupo ya está entre paréntesis.
+* `Exceptions.lean` pasa de 42 a 57 ejemplos compilados, más cuatro `#guard`
+  sobre `findSep`. Los `#guard` son para los operadores grandes: Verbose no
+  importa esa notación, así que no se puede escribir un `example` que elabore, y
+  como la regla es léxica se prueba donde vive.
